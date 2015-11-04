@@ -27,16 +27,24 @@ file = open('data/test.xls')
 # now read excel file data into a DataFrame
 pigeonData = pd.read_excel(file)
 
+# define the class for pigeon objects
+class Pigeon:
+    def __init__(self,data):
+        self.allData = data
+
 # separate columns into pandas series'
-xCoords = list(pigeonData['X'])
-yCoords = list(pigeonData['Y'])
-allPecks = list(pigeonData['Peck'])
-allTrials = list(pigeonData['TrialInfo'])
+#xCoords = list(pigeonData['X'])
+#yCoords = list(pigeonData['Y'])
+#allPecks = list(pigeonData['Peck'])
+#allTrials = list(pigeonData['TrialInfo'])
 
 # loop over allTrials series to extract trial properties
-for trial in allTrials:
-    [pigeon, condition, session, trial, group] = trial.split("_")
+#for trial in allTrials:
+#    [pigeon, condition, session, trial, group] = trial.split("_")
+
+
 
 # loop over peckNum series to extract indices where goal
-for peckNum in allPecks:
-    if peckNum == 'goal':
+#for peckNum in allPecks:
+#    if peckNum == 'goal':
+#        continue
