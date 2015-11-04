@@ -16,35 +16,40 @@ OUT:
 '''
 # Import relevant packages
 import pandas as pd  # import pandas data structures (DataFrame) and read_excel
+from pigeon import Pigeon# import module with class/functions
+import Tkinter, tkFileDialog
+from os import chdir
+import glob
 
 # Initialize variables
-xCoords, yCoords, peckNum, trial = {}, {}, {}, {}
-pigeon, condition, session, trial, group = 0, '', '', 0, ''
+pigeonName = ''
+allPigeons = {}
+
+# locate the data directory and store all files in a list
+root = Tkinter.Tk() # create GUI root
+root.withdraw() # keep the root window from appearing
+''' Left out for convenience during testing
+dirname = tkFileDialog.askdirectory(parent=root,initialdir="/",title='Please select the data directory.') # open dialog
+'''
+dirname = '/home/synapt1x/Projects/DrKellyProjects/DataProcessor/data'
+
+# cd to data directory
+chdir(dirname)
+
+allFiles = glob.glob('*.xls') # list all files of .xls
+print allFiles
 
 # First read-in the data
-file = open('data/test.xls')
+for file in allFiles:
+    datafile = open(file)
+    index = allFiles.index(file)
 
-# now read excel file data into a DataFrame
-pigeonData = pd.read_excel(file)
+    # now read excel file data into a DataFrame
+    pigeonData = pd.read_excel(datafile)
 
-# define the class for pigeon objects
-class Pigeon:
-    def __init__(self,data):
-        self.allData = data
+    # extract pigeon name
+    pigeonName = pigeonData['Trial Information'][0].split('_')[0] # take first term from trial information in first entry
 
-# separate columns into pandas series'
-#xCoords = list(pigeonData['X'])
-#yCoords = list(pigeonData['Y'])
-#allPecks = list(pigeonData['Peck'])
-#allTrials = list(pigeonData['TrialInfo'])
+    # create pigeon
+    allPigeons[pigeonName] = Pigeon(pigeonData)
 
-# loop over allTrials series to extract trial properties
-#for trial in allTrials:
-#    [pigeon, condition, session, trial, group] = trial.split("_")
-
-
-
-# loop over peckNum series to extract indices where goal
-#for peckNum in allPecks:
-#    if peckNum == 'goal':
-#        continue
