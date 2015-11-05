@@ -36,8 +36,8 @@ dirname = '/home/synapt1x/Projects/DrKellyProjects/DataProcessor/data'
 # cd to data directory
 chdir(dirname)
 
-allFiles = glob.glob('*.xls') # list all files of .xls
-print allFiles
+# list all files of type .xls
+allFiles = glob.glob('*.xls')
 
 # First read-in the data
 for file in allFiles:
@@ -53,3 +53,9 @@ for file in allFiles:
     # create pigeon
     allPigeons[pigeonName] = Pigeon(pigeonData)
 
+# loop through all of the pigeons loaded into the dictionary allPigeons
+for pigeonName,pigeon in allPigeons.iteritems():
+    # call findGoals to find the indices of the goal locations in (x,y)
+    (indices,xGoals,yGoals) = pigeon.findGoals()
+
+    print indices, xGoals, yGoals

@@ -13,11 +13,25 @@ IN:
 OUT:
 
 '''
+
+import numpy as np
+import pandas as pd
+
 # define the class for pigeon objects
 class Pigeon:
-    def __init__(self,data): # define the constructor
+    def __init__(self,data): # define the constructor for when pigeons are made
         self.allData = data
-        self.xCoords = list(self.allData['X'])
-        self.yCoords = list(self.allData['Y'])
-        self.allPecks = list(self.allData['Peck'])
-        self.allTrials = list(self.allData['Trial Information'])
+        self.xCoords = self.allData['X']
+        self.yCoords = self.allData['Y']
+        self.allPecks = self.allData['Peck']
+        self.allTrials = self.allData['Trial Information']
+
+    def findGoals(self): # method for finding the indices corresponding to goals
+        indices = np.where(self.allPecks=='goal')[0] # find indices where allPecks has the word goal
+
+        # extract the x and y co-ordinates of each goal
+        xGoals = self.xCoords[indices]
+        yGoals = self.yCoords[indices]
+
+
+        return (indices,xGoals,yGoals)
