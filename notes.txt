@@ -1,0 +1,10 @@
+# Some notes from meeting with Dr. Kelly and Kevin
+
+Counterbalanced -- If failed, then that goes to back of order
+	-- One thing that we need to look for are these fails, when they are pushed
+	back to the back of the list (see how many repeats are in the list)
+input file defining groups -- setup.txt (e.g., geometry-first  vs. feature-first)
+output vector -- separate by group (defined by goal indices)
+(x,y) --> relative to goal anyway
+keep all pecks -- each quadrant can become a theoretical goal (extrapolated
+from known goal position)
