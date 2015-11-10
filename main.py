@@ -28,10 +28,11 @@ allPigeons = {}
 # locate the data directory and store all files in a list
 root = Tkinter.Tk() # create GUI root
 root.withdraw() # keep the root window from appearing
-''' Left out for convenience during testing'''
+''' Left out for convenience during testing
 dirname = tkFileDialog.askdirectory(parent=root,initialdir="/",title='Please select the data directory.') # open dialog
+'''
 
-#dirname = '/home/synapt1x/Projects/DrKellyProjects/DataProcessor/data'
+dirname = '/home/synapt1x/Projects/DrKellyProjects/DataProcessor/data'
 
 # cd to data directory
 chdir(dirname)
