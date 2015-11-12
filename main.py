@@ -38,7 +38,7 @@ dirname = '/home/synapt1x/Projects/DrKellyProjects/DataProcessor/data'
 chdir(dirname)
 
 # list all files of type .xls
-allFiles = glob.glob('*.xls')
+allFiles = glob.glob('*test.xls')
 
 # First read-in the data
 for file in allFiles:
@@ -57,6 +57,10 @@ for file in allFiles:
 # loop through all of the pigeons loaded into the dictionary allPigeons
 for pigeonName,pigeon in allPigeons.iteritems():
     # call findGoals to find the indices of the goal locations in (x,y)
-    (indices,xGoals,yGoals) = pigeon.findGoals()
+    (xGoals,yGoals) = pigeon.findGoals()
 
-    print indices, xGoals, yGoals
+    # call parseTrialInfo to separate data into session, trial and trial type
+    trialInfo = pigeon.parseTrialInfo()
+
+    print xGoals,yGoals
+    print trialInfo
