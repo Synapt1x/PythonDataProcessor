@@ -60,4 +60,6 @@ for pigeonName,pigeon in allPigeons.iteritems():
     (xGoals,yGoals) = pigeon.findGoals()
 
     # separate data into session, trial and trial type
-    pigeon.parseTrialInfo()
+    trialInfo = pigeon.parseTrialInfo()
+    
+    print trialInfo
