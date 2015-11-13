@@ -24,6 +24,8 @@ class Pigeon:
         self.allPecks = self.allData['Peck']
         self.allTrials = self.allData['Trial Information']
         self.allCalibs = self.allData['Calibration Coefficient']
+        self.sessions = {}
+        self.trials = {}
 
         # import x and y coordinates with conversion
         self.xCoords = self.allCalibs*self.allData['X']/10
@@ -39,6 +41,6 @@ class Pigeon:
         return (self.xGoals,self.yGoals)
 
     def parseTrialInfo(self): # method for parsing the trial information series
-        self.EachTrial = self.allTrials[self.indices]
+        eachTrial = self.allTrials[self.indices]
 
-        return self.EachTrial
+        return eachTrial
