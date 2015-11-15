@@ -43,4 +43,3 @@ class Pigeon:
     def parseTrialInfo(self): # method for parsing the trial information series
         eachTrial = self.allTrials[self.indices]
 
-        return eachTrial
