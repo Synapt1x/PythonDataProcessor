@@ -61,5 +61,3 @@ for pigeonName,pigeon in allPigeons.iteritems():
 
     # separate data into session, trial and trial type
     trialInfo = pigeon.parseTrialInfo()
-    
-    print trialInfo
