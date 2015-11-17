@@ -57,7 +57,9 @@ for file in allFiles:
 # loop through all of the pigeons loaded into the dictionary allPigeons
 for pigeonName,pigeon in allPigeons.iteritems():
     # find the indices of the goal locations in (x,y)
-    (xGoals,yGoals) = pigeon.findGoals()
+    (pigeon.xGoals,pigeon.yGoals) = pigeon.findGoals('goal')
+    (pigeon.xOppGoal,pigeon.yOppGoal) = pigeon.findGoals('Opp goal')
+    (pigeon.xAFGoal,pigeon.yAFGoal) = pigeon.findGoals('AF goal')
 
     # separate data into session, trial and trial type
     trialInfo = pigeon.parseTrialInfo()
