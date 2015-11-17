@@ -45,15 +45,15 @@ class Pigeon:
 
         print self.dataframe
 
-    def findGoals(self): # method for finding the indices corresponding to goals
+    def findGoals(self,goalType): # method for finding the indices corresponding to goals
         # find indices where allPecks has the word goal
-        self.indices = np.where(self.dataframe['Peck']=='goal')[0]
+        self.indices = np.where(self.dataframe['Peck']==goalType)[0]
 
         # extract the x and y co-ordinates of each goal
-        self.xGoals = self.dataframe['X'][self.indices]
-        self.yGoals = self.dataframe['Y'][self.indices]
+        xGoals = self.dataframe['X'][self.indices]
+        yGoals = self.dataframe['Y'][self.indices]
 
-        return (self.xGoals,self.yGoals)
+        return (xGoals,yGoals)
 
     def parseTrialInfo(self): # method for parsing the trial information series
         # find each trial based on when a new goal is defined
