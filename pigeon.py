@@ -19,27 +19,48 @@ import pandas as pd
 
 # define the class for pigeon objects
 class Pigeon:
-    def __init__(self,data): # define the constructor for when pigeons are made
-        self.allData = data
-        self.allPecks = self.allData['Peck']
-        self.allTrials = self.allData['Trial Information']
-        self.allCalibs = self.allData['Calibration Coefficient']
-        self.sessions = {}
-        self.trials = {}
 
-        # import x and y coordinates with conversion
-        self.xCoords = self.allCalibs*self.allData['X']/10
-        self.yCoords = self.allCalibs*self.allData['Y']/10
+    def processFrame(self,dataframe): # method for formatting the dataframe
+
+        # convert x and y coordinates by calibration coefficients
+        self.dataframe['X'] = self.dataframe['Calibration Coefficient']*self.dataframe['X']/10
+        self.dataframe['Y'] = self.dataframe['Calibration Coefficient']*self.dataframe['Y']/10
+
+        # separate Trial Information into separate columns
+        colnames = ['Pigeon Name','Experiment Phase','Session','Trial','Trial Type'] #name the columns
+        tempDf=pd.DataFrame(dataframe['Trial Information'].str.split('_').tolist(),columns=colnames)
+
+        # remove calibration coeffient and trial information columns
+        self.dataframe = self.dataframe.drop(['Calibration Coefficient','Trial Information'],axis=1)
+
+        # add the columns extracted from trial information
+        self.dataframe = self.dataframe.join(tempDf)
+
+        return self.dataframe
+
+    def __init__(self,data): # define the constructor for when pigeons are made
+        self.dataframe = data
+
+        self.dataframe = self.processFrame(self.dataframe)
+
+        print self.dataframe
 
     def findGoals(self): # method for finding the indices corresponding to goals
-        self.indices = np.where(self.allPecks=='goal')[0] # find indices where allPecks has the word goal
+        # find indices where allPecks has the word goal
+        self.indices = np.where(self.dataframe['Peck']=='goal')[0]
 
         # extract the x and y co-ordinates of each goal
-        self.xGoals = self.xCoords[self.indices]
-        self.yGoals = self.yCoords[self.indices]
+        self.xGoals = self.dataframe['X'][self.indices]
+        self.yGoals = self.dataframe['Y'][self.indices]
 
         return (self.xGoals,self.yGoals)
 
     def parseTrialInfo(self): # method for parsing the trial information series
-        eachTrial = self.allTrials[self.indices]
+        # find each trial based on when a new goal is defined
+        return 'parse'
 
+    def calcDist(self): # method for calculating euclidean distance from goals
+        return 'calc'
+
+    def formatOuput(self): # method for summarizing and formatting output data
+        return 'format'
