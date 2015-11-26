@@ -18,12 +18,19 @@ OUT:
 import pandas as pd  # import pandas data structures (DataFrame) and read_excel
 from pigeon import Pigeon  # import module with class/functions
 import Tkinter  # , tkFileDialog
-from os import chdir
+from os import chdir, path
 import glob
 
 # Initialize variables
 pigeonName = ''
 allPigeons = {}
+
+# locate the current directory and file location
+dirname, mainFile = path.split(path.abspath(__file__))
+
+# define the output spreadsheet
+outputFilename = path.join(dirname,'output.xls')
+
 
 # locate the data directory and store all files in a list
 root = Tkinter.Tk()  # create GUI root
@@ -33,13 +40,17 @@ dirname = tkFileDialog.askdirectory(parent=root,initialdir="/",title='Please
 select the data directory.') # open dialog
 '''
 
-dirname = '/home/synapt1x/Projects/DrKellyProjects/DataProcessor/data'
+dataDirname = '/home/synapt1x/Projects/DrKellyProjects/DataProcessor/data'
+
 
 # cd to data directory
-chdir(dirname)
+chdir(dataDirname)
 
 # list all files of type .xls
 allFiles = glob.glob('*test.xls')
+
+# create excelwriter object for outputting to excel
+writer = pd.ExcelWriter(outputFilename)
 
 # First read-in the data
 for file in allFiles:
@@ -64,4 +75,7 @@ for pigeonName, pigeon in allPigeons.iteritems():
     # separate data into session, trial and trial type
     trialInfo = pigeon.parseTrialInfo()
 
-    print pigeon.dataframe
+    # use the excel writer to save this pigeon to a data sheet in output.xlsx
+    pigeon.dataframe.to_excel(writer,pigeonName)
+
+    writer.save()
