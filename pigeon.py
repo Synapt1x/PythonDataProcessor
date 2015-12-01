@@ -37,6 +37,7 @@ class Pigeon:
         # add the columns extracted from trial information
         self.dataframe = self.dataframe.join(tempDf)
 
+        print self.dataframe
         return self.dataframe
 
     def findGoals(self, goalType):  # method for finding the indices
