@@ -83,6 +83,7 @@ class Pigeon:
 
         # initialize placeholder series to dynamically append calc for each goal
         allDists = pd.Series([])
+        trialInformation = pd.DataFrame({})
 
         # iterate over all goals with an index for loop number (i.e. trial num)
         for goalNum, peckIndex in peckIterator:
@@ -113,7 +114,7 @@ class Pigeon:
 
             # Calculate the Euclidean distance for each peck from goal
             # Also filter out distances above distance threshold
-            (finalDists,NumRemoved,AvgDist) = self.thresholdCalc(xDists,yDists, 40)
+            (finalDists,numRemoved,avgDist) = self.thresholdCalc(xDists,yDists, 40)
 
             # store all distances in Series to be added to data frame
             allDists = pd.concat([allDists,finalDists], axis=0)
@@ -123,6 +124,7 @@ class Pigeon:
 
         # Set all NaN's to 'goal'
         self.dataframe = self.dataframe.fillna('goal')
+
 
     def formatOuput(self):  # method for summarizing and formatting output data
         return 'format'
