@@ -37,7 +37,6 @@ class Pigeon:
         # add the columns extracted from trial information
         self.dataframe = self.dataframe.join(tempDf)
 
-        print self.dataframe
         return self.dataframe
 
     def findGoals(self, goalType):  # method for finding the indices
@@ -54,6 +53,24 @@ class Pigeon:
     def parseTrialInfo(self):  # method for parsing trial information series
         # find each trial based on when a new goal is defined
         return 'parse'
+
+    def thresholdCalc(self, xDists, yDists, threshold): # method for thresholding distances
+        totalDist = xDists*xDists + yDists*yDists
+        sqrtDist = totalDist.apply(sqrt)
+
+        # Set values above threshold as NaN, ignore those below
+        finalDists = sqrtDist.apply(lambda x: np.nan if x > threshold else x)
+
+        # Count number of NaNs representing number of outliers
+        numsAboveThreshold = finalDists.isnull().sum()
+
+        # Calculate the average distance after removing outliers
+        avgDist = finalDists.mean()
+
+        # Set all the finalDists to 0 instead of NaN
+        finalDists = finalDists.fillna('Out')
+
+        return (finalDists,numsAboveThreshold,avgDist)
 
     def calcDist(self):  # method for calculating euclidean distance from goals
         # call findGoals to determine the (x,y,indices) of the goals
@@ -95,8 +112,8 @@ class Pigeon:
             yDists = yPecks.apply(lambda y: y - self.goalsY[peckIndex])
 
             # Calculate the Euclidean distance for each peck from goal
-            totalDist = xDists*xDists + yDists*yDists
-            finalDists = totalDist.apply(sqrt)
+            # Also filter out distances above distance threshold
+            (finalDists,NumRemoved,AvgDist) = self.thresholdCalc(xDists,yDists, 40)
 
             # store all distances in Series to be added to data frame
             allDists = pd.concat([allDists,finalDists], axis=0)

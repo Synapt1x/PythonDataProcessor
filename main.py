@@ -76,5 +76,5 @@ for pigeonName, pigeon in allPigeons.iteritems():
     # use the excel writer to save this pigeon to a data sheet in output.xlsx
     pigeon.dataframe.to_excel(writer,pigeonName)
 
-    print 'Saving pigeon output to Output.xls...'
+    print 'Saving pigeon', pigeonName, 'output to Output.xls...'
     writer.save()
