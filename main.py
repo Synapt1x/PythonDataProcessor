@@ -15,11 +15,15 @@ OUT:
 
 '''
 # Import relevant packages
-import pandas as pd  # import pandas data structures (DataFrame) and read_excel
-from pigeon import Pigeon  # import module with class/functions
-import Tkinter#, tkFileDialog # import Tk for gui
 from os import chdir, path
+
+import pandas as pd  # import pandas data structures (DataFrame) and read_excel
+import Tkinter # import Tkinter for gui
+#import tkFileDialog # import Tk for guiding to data directory
 import glob
+
+from pigeon import Pigeon  # import module with class/functions
+
 
 # Initialize variables
 pigeonName = ''
