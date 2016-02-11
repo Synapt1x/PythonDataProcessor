@@ -26,7 +26,7 @@ pigeonName = ''
 allPigeons = {}
 
 # locate the current directory and file location
-dirname, mainFile = path.split(path.abspath(__file__))
+dirname, mainFile = path.split(path.abspath('__file__'))
 
 # define the output spreadsheet
 outputFilename = path.join(dirname,'output.xls')
@@ -35,19 +35,17 @@ outputFilename = path.join(dirname,'output.xls')
 # locate the data directory and store all files in a list
 root = Tkinter.Tk()  # create GUI root
 root.withdraw()  # keep the root window from appearing
-''' Left out for convenience during testing
-dirname = tkFileDialog.askdirectory(parent=root,initialdir="/",title='Please
-select the data directory.') # open dialog
+'''Left out for convenience during testing
+dirname = tkFileDialog.askdirectory(parent=root,initialdir="/",title='Please select the data directory.') # open dialog
 '''
-
-dataDirname = '/home/synapt1x/Projects/DrKellyProjects/DataProcessor/data'
+dataDirname = '/home/synapt1x/Projects/DrKellyProject/data'
 
 
 # cd to data directory
 chdir(dataDirname)
 
 # list all files of type .xls
-allFiles = glob.glob('*test.xls')
+allFiles = glob.glob('*Test.xls')
 
 # create excelwriter object for outputting to excel
 writer = pd.ExcelWriter(outputFilename)
@@ -78,4 +76,5 @@ for pigeonName, pigeon in allPigeons.iteritems():
     # use the excel writer to save this pigeon to a data sheet in output.xlsx
     pigeon.dataframe.to_excel(writer,pigeonName)
 
+    print 'Saving pigeon output to Output.xls...'
     writer.save()
