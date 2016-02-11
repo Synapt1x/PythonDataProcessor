@@ -83,7 +83,8 @@ class Pigeon:
 
         # initialize placeholder series to dynamically append calc for each goal
         allDists = pd.Series([])
-        trialInformation = pd.DataFrame({})
+        removedPecks = pd.Series([])
+        avgPeckDist = pd.Series([])
 
         # iterate over all goals with an index for loop number (i.e. trial num)
         for goalNum, peckIndex in peckIterator:
@@ -119,12 +120,21 @@ class Pigeon:
             # store all distances in Series to be added to data frame
             allDists = pd.concat([allDists,finalDists], axis=0)
 
+            # store the number of removed pecks and avg distances
+            removedPecks[peckIndex] = numRemoved
+
+            # store average peck distances, unless all pecks were removed
+            avgPeckDist[peckIndex] = 'No Pecks' if (numRemoved==10) else avgDist
+
         # Add all peck distances to main data frame
-        self.dataframe['Distance To Main Goal'] = allDists
+        self.dataframe['Dist To Main Goal'] = allDists
 
         # Set all NaN's to 'goal'
         self.dataframe = self.dataframe.fillna('goal')
 
+        # Add num of removed pecks and average peck distances
+        self.dataframe['Removed Pecks'] = removedPecks
+        self.dataframe['Average Dist'] = avgPeckDist
 
     def formatOuput(self):  # method for summarizing and formatting output data
         return 'format'
