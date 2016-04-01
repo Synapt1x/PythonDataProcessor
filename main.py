@@ -22,8 +22,13 @@ import Tkinter # import Tkinter for gui
 #import tkFileDialog # import Tk for guiding to data directory
 import glob
 
+import gui
+
 from pigeon import Pigeon  # import module with class/functions
 
+# export this into an isolated file for controlling GUI
+root = Tkinter.Tk()  # create GUI root
+root.withdraw()  # keep the root window from appearing
 
 # Initialize variables
 pigeonName = ''
@@ -36,11 +41,9 @@ dirname, mainFile = path.split(path.abspath('__file__'))
 outputFilename = path.join(dirname,'output.xls')
 
 # locate the data directory and store all files in a list
-root = Tkinter.Tk()  # create GUI root
-root.withdraw()  # keep the root window from appearing
-'''Left out for convenience during testing
-dataDirname = tkFileDialog.askdirectory(parent=root,initialdir="/",title='Please select the data directory.') # open dialog
-'''
+#Left out for convenience during testing
+#dataDirname = tkFileDialog.askdirectory(parent=root,initialdir="/",title='Please select the data directory.') # open dialog
+
 dataDirname = '/home/synapt1x/Projects/DrKellyProject/data'
 
 # cd to data directory

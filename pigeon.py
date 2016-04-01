@@ -137,6 +137,8 @@ class Pigeon:
         self.dataframe['Removed Pecks'] = removedPecks
         self.dataframe['Average Dist'] = avgPeckDist
 
+        print self.dataframe
+
     def formatOuput(self):  # method for summarizing and formatting output data
         return 'format'
 
