@@ -47,13 +47,23 @@ class App(Frame):
                 print "Please select a valid directory..."
         return dataDirname
 
+    def allButtons(self,buttonGroup, event):
+        for buttonNum in range(len(buttonGroup)):
+            if event == 'Select':
+                buttonGroup[buttonNum].set(1)
+            else:
+                buttonGroup[buttonNum].set(0)
+
     def createComponents(self):
         # Create text fonts for components
         self.titleFont = tkFont.Font(family='Arial',size=18)
         self.componentFont = tkFont.Font(family='Helvetica',size=16)
 
+        # Create a frame for the title section
+        #======================================================================
         titleFrame = Frame(self)
         titleFrame.pack(fill=X)
+
         # Create the title label
         title_label = Label(titleFrame, text='Data Processor For Pigeon Experiment',
                             font=self.titleFont)
@@ -64,36 +74,82 @@ class App(Frame):
         canv.create_line(0, 10, 480, 10)
         canv.pack(fill=X, anchor=CENTER, expand=True)
 
-        groupFrame = Frame(self)
-        groupFrame.pack(fill=Y, expand=True, anchor=W, side=LEFT)
+
+        # Create a frame for the group buttons
+        #======================================================================
+        grpFrame = Frame(self)
+        grpFrame.pack(fill=Y, expand=True, anchor=W, side=LEFT)
         # Create a checkbox for each test group
         grpLabels = ['Control Group','Non-reinforced','Binocular',
                        'Cap-Left','Cap-Right']
+        grpVals = []
+        grpButtons = []
+        # Create all of the group buttons
         for grpName in range(len(grpLabels)):
-            grpButton = Checkbutton(groupFrame, text=grpLabels[grpName],
-                                   variable=grpLabels[grpName],
-                                   font=self.componentFont)
-            grpButton.pack(pady=8)
+            grpVals.append(IntVar())
+            grpButtons.append(Checkbutton(grpFrame, text=grpLabels[grpName],
+                                   variable=grpVals[grpName],
+                                   font=self.componentFont))
+            grpButtons[-1].pack(pady=8)
+        grpCanv = Canvas(grpFrame, width=220, height=10)
+        grpCanv.create_line(20,10,220,10, dash=(2,4))
+        grpCanv.pack(fill=X)
 
+        # Add some select / de-select all buttons
+        selectAllGrps = Button(grpFrame, text='Select All',
+                         command=lambda:
+                         self.allButtons(grpVals,'Select')).pack()
+        deselectAllGrps = Button(grpFrame, text='De-Select All',
+                           command=lambda:
+                           self.allButtons(grpVals,'De-Select')).pack()
+
+
+        # Create a frame for handling all of the birds
+        #======================================================================
         animalsFrame = Frame(self)
         animalsFrame.pack(fill=Y, expand=True, anchor=CENTER, side=LEFT)
         animals = ['Bird1','Bird2','Bird3',
                        'Bird4','Bird5']
+        animalVals = []
+        animalButtons = []
+        # Create a button for each bird in the data directory
         for bird in range(len(animals)):
-            grpButton = Checkbutton(animalsFrame, text=animals[bird],
-                                   variable=animals[bird],
-                                   font=self.componentFont)
-            grpButton.pack(pady=8)
+            animalVals.append(IntVar())
+            animalButtons.append(Checkbutton(animalsFrame, text=animals[bird],
+                                   variable=animalVals[bird],
+                                   font=self.componentFont))
+            animalButtons[-1].pack(pady=8)
+        animalsCanv = Canvas(animalsFrame, width=220, height=10)
+        animalsCanv.create_line(20,10,220,10, dash=(2,4))
+        animalsCanv.pack(fill=X)
 
+        # Add some select / de-select all buttons
+        selectAllAnimals = Button(animalsFrame, text='Select All',
+                         command=lambda:
+                         self.allButtons(animalVals,'Select')).pack()
+        deselectAllAnimals = Button(animalsFrame, text='De-Select All',
+                           command=lambda:
+                           self.allButtons(animalVals,'De-Select')).pack()
+
+
+        # Create a frame for handling all of the additional buttons
+        #======================================================================
         buttonsFrame = Frame(self)
         buttonsFrame.pack(fill=Y, expand=True, anchor=E)
 
-
-        #footerFrame = Frame(self)
-        #footerFrame.pack(fill=BOTH)
         # Create a quit button
         quitButton = Button(buttonsFrame, text='Quit', command=self.quit)
-        quitButton.pack()
+        quitButton.pack(fill=X)
+
+
+        # Create a frame for the bottom section
+        #======================================================================
+        footerFrame = Frame(self)
+        footerFrame.pack(anchor=CENTER, expand=True)
+
+        '''bottomCanv = Canvas(footerFrame, width=480, height=10)
+        bottomCanv.create_line(0,5,480,5)
+        bottomCanv.pack(fill=Y,expand=True)'''
 
 app = App(root) # place all components
-root.mainloop()
+root.mainloop() # run the GUI
