@@ -18,22 +18,13 @@ OUT:
 from os import chdir, path
 
 import pandas as pd  # import pandas data structures (DataFrame) and read_excel
-from Tkinter import * # import Tkinter for gui
 import glob
 
 # Import GUI developed for the program
-from finalGUI import App
+import finalGUI
 
 # Import module with class/functions
 from pigeon import Pigeon
-
-# create the gui and display it using the gui.py program
-root = Tk()  # create GUI root
-root.wm_title('Data Processor') # create title label
-root.geometry('480x360+300+300') # set the size of the window
-
-app = App(root) # place all components
-root.mainloop()
 
 # Initialize variables
 pigeonName = ''
