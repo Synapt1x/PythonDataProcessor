@@ -21,6 +21,11 @@ from ttk import Frame, Style
 import tkFileDialog
 import tkFont
 
+root = Tk()  # create GUI root
+root.wm_title('Data Processor') # create title label
+root.geometry('480x360+300+300') # set the size of the window
+
+
 class App(Frame):
 
     def __init__(self, parent):
@@ -28,8 +33,19 @@ class App(Frame):
 
         self.pack(fill=BOTH, expand=True)
         self.createComponents()
-        self.dataDirname = tkFileDialog.askdirectory(parent=self,
-            initialdir="/",title='Please select the data directory.')
+        #self.dataDirname = self.findDirectory()
+
+    def findDirectory(self):
+        while True:
+            try:
+                dataDirname = tkFileDialog.askdirectory(parent=self,
+                    initialdir="/",title='Please select the data directory.')
+                if not dataDirname:
+                    raise ValueError('empty string')
+                break
+            except ValueError:
+                print "Please select a valid directory..."
+        return dataDirname
 
     def createComponents(self):
         # Create text fonts for components
@@ -78,3 +94,6 @@ class App(Frame):
         # Create a quit button
         quitButton = Button(buttonsFrame, text='Quit', command=self.quit)
         quitButton.pack()
+
+app = App(root) # place all components
+root.mainloop()
