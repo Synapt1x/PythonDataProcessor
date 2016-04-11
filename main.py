@@ -18,17 +18,22 @@ OUT:
 from os import chdir, path
 
 import pandas as pd  # import pandas data structures (DataFrame) and read_excel
-import Tkinter # import Tkinter for gui
-#import tkFileDialog # import Tk for guiding to data directory
+from Tkinter import * # import Tkinter for gui
 import glob
 
-import gui
+# Import GUI developed for the program
+from finalGUI import App
 
-from pigeon import Pigeon  # import module with class/functions
+# Import module with class/functions
+from pigeon import Pigeon
 
-# export this into an isolated file for controlling GUI
-root = Tkinter.Tk()  # create GUI root
-root.withdraw()  # keep the root window from appearing
+# create the gui and display it using the gui.py program
+root = Tk()  # create GUI root
+root.wm_title('Data Processor') # create title label
+root.geometry('480x360+300+300') # set the size of the window
+
+app = App(root) # place all components
+root.mainloop()
 
 # Initialize variables
 pigeonName = ''
@@ -42,7 +47,7 @@ outputFilename = path.join(dirname,'output.xls')
 
 # locate the data directory and store all files in a list
 #Left out for convenience during testing
-#dataDirname = tkFileDialog.askdirectory(parent=root,initialdir="/",title='Please select the data directory.') # open dialog
+#dataDirname = app.dataDirname
 
 dataDirname = '/home/synapt1x/Projects/DrKellyProject/data'
 

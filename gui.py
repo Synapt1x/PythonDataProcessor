@@ -36,7 +36,7 @@ class App(Frame):
         self.initUI()
 
     def toggle(toggle_btn):
-        print toggle_btn.config('relief')[-1]
+        print toggle_btn.config('text')
         if toggle_btn.config('relief')[-1] == 'raised':
             toggle_btn.config(relief='sunken')
         else:
@@ -81,7 +81,7 @@ class App(Frame):
         baby1_button = Tkinter.Button(text='Baby1', width=12, relief='raised', command=self.toggle)
         baby1_button.place(x=180, y=30)
 
-        baby2_button = Tkinter.Button(text='Baby2', width=12, relief='raised', command=self.toggle)
+        baby2_button = Tkinter.Button(text='Baby2', width=12, relief='sunken', command=self.toggle)
         baby2_button.place(x=180, y=65)
 
         baby3_button = Tkinter.Button(text='Baby3', width=12, relief='raised')
