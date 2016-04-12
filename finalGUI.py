@@ -23,11 +23,11 @@ import tkFont
 
 root = Tk()  # create GUI root
 root.wm_title('Data Processor') # create title label
-root.geometry('480x360+300+300') # set the size of the window
-
+root.geometry('480x520+300+300') # set the size of the window
 
 class App(Frame):
 
+    # Constructor
     def __init__(self, parent):
         Frame.__init__(self, parent)
 
@@ -35,6 +35,7 @@ class App(Frame):
         self.createComponents()
         #self.dataDirname = self.findDirectory()
 
+    # Ask user to identify the data directory
     def findDirectory(self):
         while True:
             try:
@@ -47,6 +48,7 @@ class App(Frame):
                 print "Please select a valid directory..."
         return dataDirname
 
+    # Callback for select all and de-select all buttons
     def allButtons(self,buttonGroup, event):
         for buttonNum in range(len(buttonGroup)):
             if event == 'Select':
@@ -54,6 +56,11 @@ class App(Frame):
             else:
                 buttonGroup[buttonNum].set(0)
 
+    # Output the desired analyses
+    def run(self):
+        print 'let us do this'
+
+    # Create all of the buttons and components of the GUI
     def createComponents(self):
         # Create text fonts for components
         self.titleFont = tkFont.Font(family='Arial',size=18)
@@ -74,11 +81,20 @@ class App(Frame):
         canv.create_line(0, 10, 480, 10)
         canv.pack(fill=X, anchor=CENTER, expand=True)
 
+        # Create a frame for the bottom section
+        #======================================================================
+        footerFrame = Frame(self)
+        footerFrame.pack(anchor=S, expand=True, side=BOTTOM)
+
+        # Create a run button
+        runButton = Button(footerFrame, width=200,text='Run Processing', command=self.run)
+        runButton.pack(fill=Y)
+
 
         # Create a frame for the group buttons
         #======================================================================
         grpFrame = Frame(self)
-        grpFrame.pack(fill=Y, expand=True, anchor=W, side=LEFT)
+        grpFrame.pack(expand=True, anchor=W, side=LEFT)
         # Create a checkbox for each test group
         grpLabels = ['Control Group','Non-reinforced','Binocular',
                        'Cap-Left','Cap-Right']
@@ -107,9 +123,9 @@ class App(Frame):
         # Create a frame for handling all of the birds
         #======================================================================
         animalsFrame = Frame(self)
-        animalsFrame.pack(fill=Y, expand=True, anchor=CENTER, side=LEFT)
+        animalsFrame.pack(expand=True, anchor=CENTER, side=LEFT)
         animals = ['Bird1','Bird2','Bird3',
-                       'Bird4','Bird5']
+                       'Bird4','Bird5', 'Bird6','Bird7','Bird8']
         animalVals = []
         animalButtons = []
         # Create a button for each bird in the data directory
@@ -135,21 +151,12 @@ class App(Frame):
         # Create a frame for handling all of the additional buttons
         #======================================================================
         buttonsFrame = Frame(self)
-        buttonsFrame.pack(fill=Y, expand=True, anchor=E)
+        buttonsFrame.pack(fill=X, expand=True)
 
         # Create a quit button
         quitButton = Button(buttonsFrame, text='Quit', command=self.quit)
-        quitButton.pack(fill=X)
+        quitButton.pack()
 
-
-        # Create a frame for the bottom section
-        #======================================================================
-        footerFrame = Frame(self)
-        footerFrame.pack(anchor=CENTER, expand=True)
-
-        '''bottomCanv = Canvas(footerFrame, width=480, height=10)
-        bottomCanv.create_line(0,5,480,5)
-        bottomCanv.pack(fill=Y,expand=True)'''
-
-app = App(root) # place all components
-root.mainloop() # run the GUI
+# run the GUI
+app = App(root)
+root.mainloop()
