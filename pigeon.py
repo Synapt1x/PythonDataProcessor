@@ -51,10 +51,6 @@ class Pigeon:
 
         return (xGoals, yGoals, goalIndices)
 
-    def parseTrialInfo(self):  # method for parsing trial information series
-        # find each trial based on when a new goal is defined
-        return 'parse'
-
     def thresholdCalc(self, xDists, yDists, threshold): # method for thresholding distances
         totalDist = xDists*xDists + yDists*yDists
         sqrtDist = totalDist.apply(sqrt)

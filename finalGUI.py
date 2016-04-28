@@ -18,12 +18,74 @@ OUT:
 from PIL import Image, ImageTk
 from Tkinter import *
 from ttk import Frame, Style
+import glob
+
+from os import chdir, path
+
+import pandas as pd  # import pandas data structures (DataFrame) and read_excel
+
+# Import module with class/functions
+from pigeon import Pigeon
+
+# Import for directory dialog
 import tkFileDialog
 import tkFont
 
 root = Tk()  # create GUI root
 root.wm_title('Data Processor') # create title label
 root.geometry('480x520+300+300') # set the size of the window
+
+# Initialize variables
+pigeonName = ''
+allPigeons = {}
+allData = {}
+
+# locate the current directory and file location
+dirname, mainFile = path.split(path.abspath('__file__'))
+
+# define the output spreadsheet
+outputFilename = path.join(dirname,'output.xls')
+
+# locate the data directory and store all files in a list
+#Left out for convenience during testing
+#dataDirname = app.dataDirname
+
+dataDirname = '/home/synapt1x/Projects/DrKellyProject/data'
+
+# cd to data directory
+chdir(dataDirname)
+
+# list all files of type .xls
+allFiles = glob.glob('*Test.xls')
+
+# create excelwriter object for outputting to excel
+writer = pd.ExcelWriter(outputFilename)
+
+# First read-in the data
+for file in allFiles:
+    datafile = open(file)
+    index = allFiles.index(file)
+
+    # now read excel file data into a DataFrame
+    pigeonData = pd.read_excel(datafile)
+
+    # extract pigeon name
+    pigeonName = pigeonData['Trial Information'][0].split('_')[0]  # take first
+    # term from trial information in first entry
+
+    # create pigeon
+    allPigeons[pigeonName] = Pigeon(pigeonData)
+
+# loop through all of the pigeons loaded into the dictionary allPigeons
+for pigeonName, pigeon in allPigeons.iteritems():
+    # find the indices of the goal locations in (x,y)
+    pigeon.calcDist()
+
+    # use the excel writer to save this pigeon to a data sheet in output.xlsx
+    pigeon.dataframe.to_excel(writer,sheet_name = pigeonName)
+
+    # also save each pigeon data to a dictionary for GUI processing
+    allData[pigeonName]=pigeon.dataframe
 
 class App(Frame):
 
@@ -59,6 +121,7 @@ class App(Frame):
     # Output the desired analyses
     def run(self):
         print 'let us do this'
+        print allData
 
     # Create all of the buttons and components of the GUI
     def createComponents(self):
