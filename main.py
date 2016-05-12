@@ -124,14 +124,18 @@ class App(Frame):
         initialFileName = todaysDate + '-Groups.xls'
         chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname, initialfile=initialFileName)
 
-        # create excelwriter object for outputting to excel
-        writer = pd.ExcelWriter(chosenName)
+        try:
+            # create excelwriter object for outputting to excel
+            writer = pd.ExcelWriter(chosenName)
 
-        # create the excel writer object
-        outputFrame.to_excel(writer,sheet_name = 'Main Processing')
+            # create the excel writer object
+            outputFrame.to_excel(writer,sheet_name = 'Main Processing')
 
-        print 'Saving output of chosen groups and pigeons to ', chosenName
-        writer.save()
+            print 'Saving output of chosen groups and pigeons to ', chosenName
+            writer.save()
+        except runtimeError:
+            print "Saving was cancelled..."
+
 
     # Create all of the buttons and components of the GUI
     def createComponents(self):
