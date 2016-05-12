@@ -18,7 +18,9 @@ OUT:
 from PIL import Image, ImageTk
 from Tkinter import *
 from ttk import Frame, Style
+
 import glob
+import time
 
 from os import chdir, path
 
@@ -39,6 +41,7 @@ root.geometry('480x520+300+300') # set the size of the window
 pigeonName = ''
 allPigeons = {}
 allData = {}
+groupsForOutput = []
 
 # locate the current directory and file location
 dirname, mainFile = path.split(path.abspath('__file__'))
@@ -46,11 +49,18 @@ dirname, mainFile = path.split(path.abspath('__file__'))
 # define the output spreadsheet
 outputFilename = path.join(dirname,'output.xls')
 
-# locate the data directory and store all files in a list
-#Left out for convenience during testing
-#dataDirname = app.dataDirname
+# Ask user to identify the data directory
+while True:
+    try:
+        dataDirname = tkFileDialog.askdirectory(parent=root,
+            initialdir="/",title='Please select the data directory.')
+        if not dataDirname:
+            raise ValueError('empty string')
+        break
+    except ValueError:
+        print "Please select a valid directory..."
 
-dataDirname = '/home/synapt1x/Projects/DrKellyProject/data'
+#dataDirname = '/home/synapt1x/Projects/DrKellyProject/data'
 
 # cd to data directory
 chdir(dataDirname)
@@ -58,8 +68,8 @@ chdir(dataDirname)
 # list all files of type .xls
 allFiles = glob.glob('*Test.xls')
 
-# create excelwriter object for outputting to excel
-writer = pd.ExcelWriter(outputFilename)
+# create excelwriter object for outputting all data to excel
+allWriter = pd.ExcelWriter(outputFilename)
 
 # First read-in the data
 for file in allFiles:
@@ -81,8 +91,8 @@ for pigeonName, pigeon in allPigeons.iteritems():
     # find the indices of the goal locations in (x,y)
     pigeon.calcDist()
 
-    # use the excel writer to save this pigeon to a data sheet in output.xlsx
-    pigeon.dataframe.to_excel(writer,sheet_name = pigeonName)
+    # use the excel writer to save this pigeon to a data sheet in output.xls
+    pigeon.dataframe.to_excel(allWriter,sheet_name = pigeonName)
 
     # also save each pigeon data to a dictionary for GUI processing
     allData[pigeonName]=pigeon.dataframe
@@ -95,20 +105,6 @@ class App(Frame):
 
         self.pack(fill=BOTH, expand=True)
         self.createComponents()
-        #self.dataDirname = self.findDirectory()
-
-    # Ask user to identify the data directory
-    def findDirectory(self):
-        while True:
-            try:
-                dataDirname = tkFileDialog.askdirectory(parent=self,
-                    initialdir="/",title='Please select the data directory.')
-                if not dataDirname:
-                    raise ValueError('empty string')
-                break
-            except ValueError:
-                print "Please select a valid directory..."
-        return dataDirname
 
     # Callback for select all and de-select all buttons
     def allButtons(self,buttonGroup, event):
@@ -120,8 +116,22 @@ class App(Frame):
 
     # Output the desired analyses
     def run(self):
-        print 'let us do this'
-        print allData
+        groupsForOutput = self.getGroups(self.grpVals)
+        outputFrame = self.analyzeGroups(groupsForOutput)
+
+        # get the output name for saving the excel file
+        todaysDate = time.strftime("%Y-%m-%d")
+        initialFileName = todaysDate + '-Groups.xls'
+        chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname, initialfile=initialFileName)
+
+        # create excelwriter object for outputting to excel
+        writer = pd.ExcelWriter(chosenName)
+
+        # create the excel writer object
+        outputFrame.to_excel(writer,sheet_name = 'Main Processing')
+
+        print 'Saving output of chosen groups and pigeons to ', chosenName
+        writer.save()
 
     # Create all of the buttons and components of the GUI
     def createComponents(self):
@@ -144,6 +154,7 @@ class App(Frame):
         canv.create_line(0, 10, 480, 10)
         canv.pack(fill=X, anchor=CENTER, expand=True)
 
+
         # Create a frame for the bottom section
         #======================================================================
         footerFrame = Frame(self)
@@ -159,15 +170,16 @@ class App(Frame):
         grpFrame = Frame(self)
         grpFrame.pack(expand=True, anchor=W, side=LEFT)
         # Create a checkbox for each test group
-        grpLabels = ['Control Group','Non-reinforced','Binocular',
+        self.grpLabels = ['Control Group','Non-reinforced','Binocular',
                        'Cap-Left','Cap-Right']
-        grpVals = []
+        self.grpKeys = ['CTRL','NR','BIN','CL','CR']
+        self.grpVals = []
         grpButtons = []
         # Create all of the group buttons
-        for grpName in range(len(grpLabels)):
-            grpVals.append(IntVar())
-            grpButtons.append(Checkbutton(grpFrame, text=grpLabels[grpName],
-                                   variable=grpVals[grpName],
+        for grpName in range(len(self.grpLabels)):
+            self.grpVals.append(IntVar())
+            grpButtons.append(Checkbutton(grpFrame, text=self.grpLabels[grpName],
+                                   variable=self.grpVals[grpName],
                                    font=self.componentFont))
             grpButtons[-1].pack(pady=8)
         grpCanv = Canvas(grpFrame, width=220, height=10)
@@ -177,10 +189,10 @@ class App(Frame):
         # Add some select / de-select all buttons
         selectAllGrps = Button(grpFrame, text='Select All',
                          command=lambda:
-                         self.allButtons(grpVals,'Select')).pack()
+                         self.allButtons(self.grpVals,'Select')).pack()
         deselectAllGrps = Button(grpFrame, text='De-Select All',
                            command=lambda:
-                           self.allButtons(grpVals,'De-Select')).pack()
+                           self.allButtons(self.grpVals,'De-Select')).pack()
 
 
         # Create a frame for handling all of the birds
@@ -220,6 +232,43 @@ class App(Frame):
         quitButton = Button(buttonsFrame, text='Quit', command=self.quit)
         quitButton.pack()
 
+    def create_window(self):
+        self.counter += 1
+        t = tk.Toplevel(self)
+        t.wm_title("Window #%s" % self.counter)
+        l = tk.Label(t, text="This is window #%s" % self.counter)
+        l.pack(side="top", fill="both", expand=True, padx=100, pady=100)
+
+
+    # function for determining which groups will be analyzed
+    def getGroups(self, buttons):
+        groupsForOutput = []
+
+        # check which buttons are selected
+        for buttonNum in buttons:
+            if buttonNum.get():
+                indexOfButton = buttons.index(buttonNum)
+                groupsForOutput.append(self.grpKeys[indexOfButton])
+        return groupsForOutput
+
+    # function for parsing dataframe based on groups
+    def analyzeGroups(self, groups):
+        outputFrame = pd.DataFrame({})
+
+        for pigeon in allData:
+            for group in groups:
+                pigeonFrame = allData[pigeon]
+                tempFrame = pigeonFrame.loc[pigeonFrame['Trial Type']==group][['Pigeon Name','Trial Type','Average Dist']]
+
+                # remove NaNs and 'No Pecks'
+                tempFrame = tempFrame.dropna()
+                tempFrame[tempFrame['Average Dist'].str.contains("No Peck")==False]
+
+                outputFrame = outputFrame.append(tempFrame)
+        return outputFrame
+
 # run the GUI
 app = App(root)
+
+root.resizable(width=FALSE, height=FALSE)
 root.mainloop()
