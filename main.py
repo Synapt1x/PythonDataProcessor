@@ -1,4 +1,4 @@
-'''
+"""
 Data Processor
 ============================
 Created by: Chris Cadonic
@@ -13,7 +13,7 @@ IN:
 
 OUT:
 
-'''
+"""
 #import Tkinter as tk# import tk for gui
 from PIL import Image, ImageTk
 from Tkinter import *
@@ -34,40 +34,38 @@ import tkFileDialog
 import tkFont
 
 root = Tk()  # create GUI root
-root.wm_title('Data Processor') # create title label
-root.geometry('480x520+300+300') # set the size of the window
+root.wm_title("Data Processor") # create title label
+root.geometry("480x520+300+300") # set the size of the window
 
 # Initialize variables
-pigeonName = ''
+pigeonName = ""
 allPigeons = {}
 allData = {}
 groupsForOutput = []
 
 # locate the current directory and file location
-dirname, mainFile = path.split(path.abspath('__file__'))
+dirname, mainFile = path.split(path.abspath("__file__"))
 
 # define the output spreadsheet
-outputFilename = path.join(dirname,'output.xls')
+outputFilename = path.join(dirname,"output.xls")
 
 # Ask user to identify the data directory
-'''while True:
+while True:
     try:
         dataDirname = tkFileDialog.askdirectory(parent=root,
-            initialdir="/",title='Please select the data directory.')
+            initialdir="//",title="Please select the data directory.")
         if not dataDirname:
-            raise ValueError('empty string')
+            raise ValueError("empty string")
         break
     except ValueError:
         print "Please select a valid directory..."
-'''
 
-dataDirname = '/home/synapt1x/Projects/DrKellyProject/data'
 
 # cd to data directory
 chdir(dataDirname)
 
 # list all files of type .xls
-allFiles = glob.glob('*Test.xls')
+allFiles = glob.glob("*Test.xls")
 
 # create excelwriter object for outputting all data to excel
 allWriter = pd.ExcelWriter(outputFilename)
@@ -81,7 +79,7 @@ for file in allFiles:
     pigeonData = pd.read_excel(datafile)
 
     # extract pigeon name
-    pigeonName = pigeonData['Trial Information'][0].split('_')[0]  # take first
+    pigeonName = pigeonData["Trial Information"][0].split('_')[0]  # take first
     # term from trial information in first entry
 
     # create pigeon
@@ -110,7 +108,7 @@ class App(Frame):
     # Callback for select all and de-select all buttons
     def allButtons(self,buttonGroup, event):
         for buttonNum in range(len(buttonGroup)):
-            if event == 'Select':
+            if event == "Select":
                 buttonGroup[buttonNum].set(1)
             else:
                 buttonGroup[buttonNum].set(0)
@@ -122,7 +120,7 @@ class App(Frame):
 
         # get the output name for saving the excel file
         todaysDate = time.strftime("%Y-%m-%d")
-        initialFileName = todaysDate + '-Groups.xls'
+        initialFileName = todaysDate + "-Groups.xls"
         chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname, initialfile=initialFileName)
 
         try:
@@ -130,9 +128,9 @@ class App(Frame):
             writer = pd.ExcelWriter(chosenName)
 
             # create the excel writer object
-            outputFrame.to_excel(writer,sheet_name = 'Main Processing')
+            outputFrame.to_excel(writer,sheet_name = "Main Processing")
 
-            print 'Saving output of chosen groups and pigeons to ', chosenName
+            print "Saving output of chosen groups and pigeons to ", chosenName
             writer.save()
         except runtimeError:
             print "Saving was cancelled..."
@@ -141,8 +139,8 @@ class App(Frame):
     # Create all of the buttons and components of the GUI
     def createComponents(self):
         # Create text fonts for components
-        self.titleFont = tkFont.Font(family='Arial',size=18)
-        self.componentFont = tkFont.Font(family='Helvetica',size=16)
+        self.titleFont = tkFont.Font(family="Arial",size=18)
+        self.componentFont = tkFont.Font(family="Helvetica",size=16)
 
         # Create a frame for the title section
         #======================================================================
@@ -150,7 +148,7 @@ class App(Frame):
         titleFrame.pack(fill=X)
 
         # Create the title label
-        title_label = Label(titleFrame, text='Data Processor For Pigeon Experiment',
+        title_label = Label(titleFrame, text="Data Processor For Pigeon Experiment",
                             font=self.titleFont)
         title_label.pack(fill=X, expand=True)
 
@@ -166,7 +164,7 @@ class App(Frame):
         footerFrame.pack(anchor=S, expand=True, side=BOTTOM)
 
         # Create a run button
-        runButton = Button(footerFrame, width=200,text='Run Processing', command=self.run)
+        runButton = Button(footerFrame, width=200,text="Run Processing", command=self.run)
         runButton.pack(fill=Y)
 
 
@@ -175,9 +173,9 @@ class App(Frame):
         grpFrame = Frame(self)
         grpFrame.pack(expand=True, anchor=W, side=LEFT)
         # Create a checkbox for each test group
-        self.grpLabels = ['Control Group','Non-reinforced','Binocular',
-                       'Cap-Left','Cap-Right']
-        self.grpKeys = ['CTRL','NR','BIN','CL','CR']
+        self.grpLabels = ["Control Group","Non-reinforced","Binocular",
+                       "Cap-Left","Cap-Right"]
+        self.grpKeys = ["CTRL","NR","BIN","CL","CR"]
         self.grpVals = []
         grpButtons = []
         # Create all of the group buttons
@@ -192,20 +190,20 @@ class App(Frame):
         grpCanv.pack(fill=X)
 
         # Add some select / de-select all buttons
-        selectAllGrps = Button(grpFrame, text='Select All',
+        selectAllGrps = Button(grpFrame, text="Select All",
                          command=lambda:
-                         self.allButtons(self.grpVals,'Select')).pack()
-        deselectAllGrps = Button(grpFrame, text='De-Select All',
+                         self.allButtons(self.grpVals,"Select")).pack()
+        deselectAllGrps = Button(grpFrame, text="De-Select All",
                            command=lambda:
-                           self.allButtons(self.grpVals,'De-Select')).pack()
+                           self.allButtons(self.grpVals,"De-Select")).pack()
 
 
         # Create a frame for handling all of the birds
         #======================================================================
         animalsFrame = Frame(self)
         animalsFrame.pack(expand=True, anchor=CENTER, side=LEFT)
-        animals = ['Bird1','Bird2','Bird3',
-                       'Bird4','Bird5', 'Bird6','Bird7','Bird8']
+        animals = ["Bird1","Bird2","Bird3",
+                       "Bird4","Bird5", "Bird6","Bird7","Bird8"]
         animalVals = []
         animalButtons = []
         # Create a button for each bird in the data directory
@@ -220,12 +218,12 @@ class App(Frame):
         animalsCanv.pack(fill=X)
 
         # Add some select / de-select all buttons
-        selectAllAnimals = Button(animalsFrame, text='Select All',
+        selectAllAnimals = Button(animalsFrame, text="Select All",
                          command=lambda:
-                         self.allButtons(animalVals,'Select')).pack()
-        deselectAllAnimals = Button(animalsFrame, text='De-Select All',
+                         self.allButtons(animalVals,"Select")).pack()
+        deselectAllAnimals = Button(animalsFrame, text="De-Select All",
                            command=lambda:
-                           self.allButtons(animalVals,'De-Select')).pack()
+                           self.allButtons(animalVals,"De-Select")).pack()
 
 
         # Create a frame for handling all of the additional buttons
@@ -234,7 +232,7 @@ class App(Frame):
         buttonsFrame.pack(fill=X, expand=True)
 
         # Create a quit button
-        quitButton = Button(buttonsFrame, text='Quit', command=self.quit)
+        quitButton = Button(buttonsFrame, text="Quit", command=self.quit)
         quitButton.pack()
 
     def create_window(self):
@@ -263,11 +261,11 @@ class App(Frame):
         for pigeon in allData:
             for group in groups:
                 pigeonFrame = allData[pigeon]
-                tempFrame = pigeonFrame.loc[pigeonFrame['Trial Type']==group][['Pigeon Name','Trial Type','Average Dist']]
+                tempFrame = pigeonFrame.loc[pigeonFrame["Trial Type"]==group][["Pigeon Name","Trial Type","Average Dist"]]
 
-                # remove NaNs and 'No Pecks'
+                # remove NaNs and "No Pecks"
                 tempFrame = tempFrame.dropna()
-                tempFrame[tempFrame['Average Dist'].str.contains("No Peck")==False]
+                tempFrame[tempFrame["Average Dist"].str.contains("No Peck")==False]
 
                 outputFrame = outputFrame.append(tempFrame)
         return outputFrame
