@@ -53,14 +53,14 @@ outputFilename = path.join(dirname,"output.xls")
 while True:
     try:
         dataDirname = tkFileDialog.askdirectory(parent=root,
-            initialdir="//",title="Please select the data directory.")
+            initialdir="/",title="Please select the data directory.")
         if not dataDirname:
             raise ValueError("empty string")
         break
     except ValueError:
         print "Please select a valid directory..."
 
-#dataDirname = "C://Users//chris//Documents//Projects//DrKellyProject//Data//"
+#dataDirname = "C:/Users/chris/Documents/Projects/DrKellyProject/Data/"
 
 # cd to data directory
 chdir(dataDirname)
@@ -73,7 +73,7 @@ allWriter = pd.ExcelWriter(outputFilename)
 
 # First read-in the data
 for file in allFiles:
-    datafile = open(file)
+    datafile = pd.ExcelFile(file)
     index = allFiles.index(file)
 
     # now read excel file data into a DataFrame
@@ -82,6 +82,9 @@ for file in allFiles:
     # extract pigeon name
     pigeonName = pigeonData["Trial Information"][0].split('_')[0]  # take first
     # term from trial information in first entry
+
+    # convert unicode to ascii string
+    pigeonName = str(pigeonName)
 
     # create pigeon
     allPigeons[pigeonName] = Pigeon(pigeonData)
