@@ -1,4 +1,4 @@
-'''
+"""
 Pigeon class
 ============================
 Created by: Chris Cadonic
@@ -6,13 +6,13 @@ For: Dr. Debbie Kelly lab
 ----------------------------
 This module holds the class definition, and function
 definitions for use in the data processor in
-Dr. Debbie Kelly's lab.
+Dr. Debbie Kelly"s lab.
 
 IN:
 
 OUT:
 
-'''
+"""
 
 # import necessary packages
 import numpy as np
@@ -25,15 +25,15 @@ class Pigeon:
     def processFrame(self, dataframe): # method for formatting the dataframe
 
         # convert x and y coordinates by calibration coefficients
-        self.dataframe['X'] = self.dataframe['Calibration Coefficient']*self.dataframe['X']/10
-        self.dataframe['Y'] = self.dataframe['Calibration Coefficient']*self.dataframe['Y']/10
+        self.dataframe["X"] = self.dataframe["Calibration Coefficient"]*self.dataframe["X"]/10
+        self.dataframe["Y"] = self.dataframe["Calibration Coefficient"]*self.dataframe["Y"]/10
 
         # separate Trial Information into separate columns
-        colnames = ['Pigeon Name', 'Experiment Phase', 'Session', 'Trial', 'Trial Type']  #name the columns
-        tempDf=pd.DataFrame(dataframe['Trial Information'].str.split('_').tolist(),columns=colnames) # make a table with these columns to be added to self.dataframe
+        colnames = ["Pigeon Name", "Experiment Phase", "Session", "Trial", "Trial Type"]  #name the columns
+        tempDf=pd.DataFrame(dataframe["Trial Information"].str.split('_').tolist(),columns=colnames) # make a table with these columns to be added to self.dataframe
 
         # remove calibration coeffient and trial information columns
-        self.dataframe = self.dataframe.drop(['Calibration Coefficient', 'Trial Information'], axis=1)
+        self.dataframe = self.dataframe.drop(["Calibration Coefficient", "Trial Information"], axis=1)
 
         # add the columns extracted from trial information
         self.dataframe = self.dataframe.join(tempDf)
@@ -43,11 +43,11 @@ class Pigeon:
     def findGoals(self, goalType):  # method for finding the indices
         # corresponding to goals
         # find indices where allPecks has the word goal
-        goalIndices = np.where(self.dataframe['Peck'] == goalType)[0]
+        goalIndices = np.where(self.dataframe["Peck"] == goalType)[0]
 
         # extract the x and y co-ordinates of each goal
-        xGoals = self.dataframe['X'][goalIndices]
-        yGoals = self.dataframe['Y'][goalIndices]
+        xGoals = self.dataframe["X"][goalIndices]
+        yGoals = self.dataframe["Y"][goalIndices]
 
         return (xGoals, yGoals, goalIndices)
 
@@ -65,15 +65,15 @@ class Pigeon:
         avgDist = finalDists.mean()
 
         # Set all the finalDists to 0 instead of NaN
-        finalDists = finalDists.fillna('Out')
+        finalDists = finalDists.fillna("Out")
 
         return (finalDists,numsAboveThreshold,avgDist)
 
     def calcDist(self):  # method for calculating euclidean distance from goals
         # call findGoals to determine the (x,y,indices) of the goals
-        (self.goalsX, self.goalsY, self.goalIndices) = self.findGoals('goal')
-        (self.OppsX, self.OppsY, self.OppsIndices) = self.findGoals('Opp goal')
-        (self.AFsX, self.AFsY, self.AFIndices) = self.findGoals('AF goal')
+        (self.goalsX, self.goalsY, self.goalIndices) = self.findGoals("goal")
+        (self.OppsX, self.OppsY, self.OppsIndices) = self.findGoals("Opp goal")
+        (self.AFsX, self.AFsY, self.AFIndices) = self.findGoals("AF goal")
 
         # create enumerator object to go over all goals and index them
         peckIterator = enumerate(self.goalIndices)
@@ -103,8 +103,8 @@ class Pigeon:
                 del peckRange[0]
 
             # Acquire all the peck locations for this trial
-            xPecks = self.dataframe['X'][peckRange]
-            yPecks = self.dataframe['Y'][peckRange]
+            xPecks = self.dataframe["X"][peckRange]
+            yPecks = self.dataframe["Y"][peckRange]
 
             # Find each direct x and y distance from goal
             xDists = xPecks.apply(lambda x: x - self.goalsX[peckIndex])
@@ -121,20 +121,20 @@ class Pigeon:
             removedPecks[peckIndex] = numRemoved
 
             # store average peck distances, unless all pecks were removed
-            avgPeckDist[peckIndex] = 'No Pecks' if (numRemoved==10) else avgDist
+            avgPeckDist[peckIndex] = "No Pecks" if (numRemoved==10) else avgDist
 
         # Add all peck distances to main data frame
-        self.dataframe['Dist To Main Goal'] = allDists
+        self.dataframe["Dist To Main Goal"] = allDists
 
-        # Set all NaN's to 'goal'
-        self.dataframe = self.dataframe.fillna('goal')
+        # Set all NaN"s to "goal"
+        self.dataframe = self.dataframe.fillna("goal")
 
         # Add num of removed pecks and average peck distances
-        self.dataframe['Removed Pecks'] = removedPecks
-        self.dataframe['Average Dist'] = avgPeckDist
+        self.dataframe["Removed Pecks"] = removedPecks
+        self.dataframe["Average Dist"] = avgPeckDist
 
     def formatOuput(self):  # method for summarizing and formatting output data
-        return 'format'
+        return "format"
 
     def __init__(self, data):  # define the constructor for when pigeons are
         # made
