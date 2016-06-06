@@ -50,7 +50,7 @@ dirname, mainFile = path.split(path.abspath("__file__"))
 outputFilename = path.join(dirname,"output.xls")
 
 # Ask user to identify the data directory
-while True:
+"""while True:
     try:
         dataDirname = tkFileDialog.askdirectory(parent=root,
             initialdir="/",title="Please select the data directory.")
@@ -59,8 +59,9 @@ while True:
         break
     except ValueError:
         print "Please select a valid directory..."
+"""
 
-#dataDirname = "C:/Users/chris/Documents/Projects/DrKellyProject/Data/"
+dataDirname = "C:/Users/chris/Documents/Projects/DrKellyProject/Data/"
 
 # cd to data directory
 chdir(dataDirname)
