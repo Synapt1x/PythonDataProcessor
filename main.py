@@ -80,11 +80,11 @@ for file in allFiles:
     pigeonData = pd.read_excel(datafile)
 
     # extract pigeon name
-    pigeonName = pigeonData["Trial Information"][0].split('_')[0]  # take first
+    pigeonNametemp = pigeonData["Trial Information"][0].split('_')[0]  # take first
     # term from trial information in first entry
 
-    # convert unicode to ascii string
-    pigeonName = str(pigeonName)
+    # convert unicode to utf8
+    pigeonName = pigeonNametemp.encode('utf8')
 
     # create pigeon
     allPigeons[pigeonName] = Pigeon(pigeonData)
