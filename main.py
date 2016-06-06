@@ -60,6 +60,7 @@ while True:
     except ValueError:
         print "Please select a valid directory..."
 
+#dataDirname = "C://Users//chris//Documents//Projects//DrKellyProject//Data//"
 
 # cd to data directory
 chdir(dataDirname)
