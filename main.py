@@ -35,7 +35,7 @@ import tkFont
 
 root = Tk()  # create GUI root
 root.wm_title("Data Processor") # create title label
-root.geometry("480x520+300+300") # set the size of the window
+root.geometry("840x520+300+300") # set the size of the window
 
 # Initialize variables
 pigeonName = ""
@@ -120,12 +120,13 @@ class App(Frame):
 
     # Output the desired analyses
     def run(self):
-        groupsForOutput = self.getGroups(self.grpVals)
+        groupsForOutput = self.getGroups(self.grpVals, "groups")
+        trialsForOutput = self.getGroups(self.trialVals, "trials")
         outputFrame = self.analyzeGroups(groupsForOutput)
 
         # get the output name for saving the excel file
         todaysDate = time.strftime("%Y-%m-%d")
-        initialFileName = todaysDate + "-Groups.xls"
+        initialFileName = todaysDate + '-' + '-'.join(groupsForOutput) + ".xls"
         chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname, initialfile=initialFileName)
 
         try:
@@ -158,8 +159,8 @@ class App(Frame):
         title_label.pack(fill=X, expand=True)
 
         # Create a canvas for drawing a separation line
-        canv = Canvas(titleFrame, width=480, height=10)
-        canv.create_line(0, 10, 480, 10)
+        canv = Canvas(titleFrame, width=840, height=10)
+        canv.create_line(0, 10, 840, 10)
         canv.pack(fill=X, anchor=CENTER, expand=True)
 
 
@@ -173,23 +174,38 @@ class App(Frame):
         runButton.pack(fill=Y)
 
 
-        # Create a frame for the group buttons
+        # Create and populate group and trial button frames
         #======================================================================
         grpFrame = Frame(self)
         grpFrame.pack(expand=True, anchor=W, side=LEFT)
+        trialFrame = Frame(self)
+        trialFrame.pack(expand=True, anchor=CENTER, side=LEFT)
+
         # Create a checkbox for each test group
         self.grpLabels = ["Control Group","Non-reinforced","Binocular",
                        "Cap-Left","Cap-Right"]
         self.grpKeys = ["CTRL","NR","BIN","CL","CR"]
         self.grpVals = []
+
+        self.trialLabels = ["Non-reinforced training","Control 1", "Control 2",
+                        "Feature Only","Geometry Only","Affine"]
+        self.trialKeys = ["Nrtr","C1","C2","FO","GO","AF"]
+        self.trialVals = []
         grpButtons = []
-        # Create all of the group buttons
-        for grpName in range(len(self.grpLabels)):
+        trialButtons = []
+
+        # create all of the group buttons
+        for num in range(len(self.trialLabels)):
             self.grpVals.append(IntVar())
-            grpButtons.append(Checkbutton(grpFrame, text=self.grpLabels[grpName],
-                                   variable=self.grpVals[grpName],
-                                   font=self.componentFont))
+            self.trialVals.append(IntVar())
+            if (num < len(self.grpLabels)):
+                grpButtons.append(Checkbutton(grpFrame, text=self.grpLabels[num],
+                            variable=self.grpVals[num], font=self.componentFont))
+            trialButtons.append(Checkbutton(trialFrame, text=self.trialLabels[num],
+                        variable=self.trialVals[num], font=self.componentFont))
             grpButtons[-1].pack(pady=8)
+            trialButtons[-1].pack(pady=8)
+
         grpCanv = Canvas(grpFrame, width=220, height=10)
         grpCanv.create_line(20,10,220,10, dash=(2,4))
         grpCanv.pack(fill=X)
@@ -206,7 +222,7 @@ class App(Frame):
         # Create a frame for handling all of the birds
         #======================================================================
         animalsFrame = Frame(self)
-        animalsFrame.pack(expand=True, anchor=CENTER, side=LEFT)
+        animalsFrame.pack(expand=True, anchor=E, side=LEFT)
         animals = ["Bird1","Bird2","Bird3",
                        "Bird4","Bird5", "Bird6","Bird7","Bird8"]
         animalVals = []
@@ -240,6 +256,7 @@ class App(Frame):
         quitButton = Button(buttonsFrame, text="Quit", command=self.quit)
         quitButton.pack()
 
+
     def create_window(self):
         self.counter += 1
         t = tk.Toplevel(self)
@@ -249,14 +266,18 @@ class App(Frame):
 
 
     # function for determining which groups will be analyzed
-    def getGroups(self, buttons):
+    def getGroups(self, buttons, keyType):
         groupsForOutput = []
+        if (keyType == "trials"):
+            keys = self.trialKeys
+        else:
+            keys = self.grpKeys
 
         # check which buttons are selected
         for buttonNum in buttons:
             if buttonNum.get():
                 indexOfButton = buttons.index(buttonNum)
-                groupsForOutput.append(self.grpKeys[indexOfButton])
+                groupsForOutput.append(keys[indexOfButton])
         return groupsForOutput
 
     # function for parsing dataframe based on groups
