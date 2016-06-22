@@ -19,7 +19,6 @@ from PIL import Image, ImageTk
 from Tkinter import *
 import tkMessageBox
 from ttk import Frame, Style
-from HoverInfo import HoverInfo
 
 import glob
 import time
@@ -34,6 +33,8 @@ from pigeon import Pigeon
 # Import for directory dialog
 import tkFileDialog
 import tkFont
+
+#=============================================================================#
 
 root = Tk()  # create GUI root
 root.wm_title("Data Processor") # create title label
