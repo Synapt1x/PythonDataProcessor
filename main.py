@@ -17,6 +17,7 @@ OUT:
 #import Tkinter as tk# import tk for gui
 from PIL import Image, ImageTk
 from Tkinter import *
+import tkMessageBox
 from ttk import Frame, Style
 from HoverInfo import HoverInfo
 
@@ -137,26 +138,29 @@ class App(Frame):
     # Output the desired analyses
     def run(self):
         trialsForOutput = self.getGroups(self.trialVals, "trials")
-        animalsForOutput = self.getGroups(self.animalVals, "animals")
-        outputFrames = self.analyzeGroups(trialsForOutput, animalsForOutput)
+        if (trialsForOutput!=[]):
+            animalsForOutput = self.getGroups(self.animalVals, "animals")
+            outputFrames = self.analyzeGroups(trialsForOutput, animalsForOutput)
 
-        # get the output name for saving the excel file
-        todaysDate = time.strftime("%Y-%m-%d")
-        initialFileName = todaysDate + '-' + '-'.join(trialsForOutput) + ".xls"
-        chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname, initialfile=initialFileName)
+            # get the output name for saving the excel file
+            todaysDate = time.strftime("%Y-%m-%d")
+            initialFileName = todaysDate + '-' + '-'.join(trialsForOutput) + ".xls"
+            chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname, initialfile=initialFileName)
 
-        try:
-            # create excelwriter object for outputting to excel
-            writer = pd.ExcelWriter(chosenName)
+            try:
+                # create excelwriter object for outputting to excel
+                writer = pd.ExcelWriter(chosenName)
 
-            # create the excel writer object
-            for frameIndex in outputFrames:
-                outputFrames[frameIndex].to_excel(writer,sheet_name = frameIndex)
+                # create the excel writer object
+                for frameIndex in outputFrames:
+                    outputFrames[frameIndex].to_excel(writer,sheet_name = frameIndex)
 
-            print "Saving output of chosen groups and pigeons to ", chosenName
-            writer.save()
-        except:
-            print "Saving was cancelled..."
+                print "Saving output of chosen groups and pigeons to ", chosenName
+                writer.save()
+            except:
+                print "Saving was cancelled..."
+        else:
+            tkMessageBox.showinfo("No groups selected","Please select at least one grouping to analyze")
 
 
     # Create all of the buttons and components of the GUI
