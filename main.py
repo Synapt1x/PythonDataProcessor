@@ -153,7 +153,7 @@ class App(Frame):
                 print "Saving output of chosen groups and pigeons to ", chosenName
                 writer.save()
             except:
-                tkMessagebox.showinfo("Saving cancelled", "Saving operation was cancelled")
+                tkMessageBox.showinfo("Saving cancelled", "Saving operation was cancelled")
         elif (trialsForOutput==[] and animalsForOutput==[]):
             tkMessageBox.showinfo("Nothing selected",
                             "Please select something to analyze")
@@ -275,7 +275,7 @@ class App(Frame):
     # function for parsing dataframe based on groups
     def analyzeGroups(self, trials, animals):
         outputFrames = {}
-        columns = ["Pigeon Name","Trial Type","Average Dist"]
+        columns = ["Pigeon Name","Trial Type", "Average Dist"]
         goColumns = list(columns)
         goColumns[-1] = "Average Opp Dist"
         AFColumns = list(goColumns)
@@ -321,7 +321,7 @@ class App(Frame):
         tempFrame = pigeonFrame.loc[pigeonFrame["Experiment Phase"]==trial][columns]
         tempFrame = tempFrame.dropna()
 
-        tempFrame = tempFrame[~tempFrame[columns[-1]].isin(["No Pecks"])==True]
+        #tempFrame = tempFrame[~tempFrame[columns[-1]].isin(["No Pecks"])==True]
         return tempFrame
 
 # run the GUI
