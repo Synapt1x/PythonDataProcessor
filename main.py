@@ -114,15 +114,15 @@ class App(Frame):
     # function for creating the select all and de-select button frames
     def createButtons(self, frame, vals):
             # create canvas for select all and deselect all buttons
-            grpCanv = Canvas(frame, width=220, height=10)
-            grpCanv.create_line(20,10,220,10, dash=(2,4))
-            grpCanv.pack(fill=X)
+            trialCanv = Canvas(frame, width=220, height=10)
+            trialCanv.create_line(20,10,220,10, dash=(2,4))
+            trialCanv.pack(fill=X)
 
             # create each button separately
-            selectAllGrps = Button(frame, text="Select All",
+            selectAll = Button(frame, text="Select All",
                              command=lambda:
                              self.allButtons(vals,"Select")).pack()
-            deselectAllGrps = Button(frame, text="De-Select All",
+            deselectAll = Button(frame, text="De-Select All",
                                command=lambda:
                                self.allButtons(vals,"De-Select")).pack()
 
@@ -136,13 +136,12 @@ class App(Frame):
 
     # Output the desired analyses
     def run(self):
-        groupsForOutput = self.getGroups(self.grpVals, "groups")
-        trialsForOutput = self.getGroups(self.trialVals, "trials")
-        outputFrames = self.analyzeGroups(groupsForOutput, trialsForOutput)
+        trialsForOutput = self.getGroups(self.trialVals)
+        outputFrames = self.analyzeGroups(trialsForOutput)
 
         # get the output name for saving the excel file
         todaysDate = time.strftime("%Y-%m-%d")
-        initialFileName = todaysDate + '-' + '-'.join(groupsForOutput) + ".xls"
+        initialFileName = todaysDate + '-' + '-'.join(trialsForOutput) + ".xls"
         chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname, initialfile=initialFileName)
 
         try:
@@ -193,48 +192,34 @@ class App(Frame):
 
         # Create and populate group and trial button frames
         #======================================================================
-        grpFrame = Frame(self)
-        grpFrame.pack(expand=True, anchor=W, side=LEFT)
         trialFrame = Frame(self)
-        trialFrame.pack(expand=True, anchor=CENTER, side=LEFT)
+        trialFrame.pack(expand=True, anchor=W, side=LEFT)
 
         # Create a checkbox for each test group
-        self.grpLabels = ["Control Group","Non-reinforced","Binocular",
-                       "Cap-Left","Cap-Right"]
-        self.grpKeys = ["CTRL","NR","BIN","CL","CR"]
-        self.grpVals = []
-
         self.trialLabels = ["Non-reinforced training","Control 1", "Control 2",
                         "Feature Only","Geometry Only","Affine"]
         self.trialKeys = ["Nrtr","C1","C2","FO","GO","AF"]
         self.trialVals = []
 
-        grpButtons = []
         trialButtons = []
 
         # create all of the group buttons
         for num in range(len(self.trialLabels)):
-            if (num < len(self.grpLabels)):
-                self.grpVals.append(IntVar())
-                grpButtons.append(Checkbutton(grpFrame, text=self.grpLabels[num],
-                            variable=self.grpVals[num], font=self.componentFont))
             self.trialVals.append(IntVar())
             trialButtons.append(Checkbutton(trialFrame, text=self.trialLabels[num],
                         variable=self.trialVals[num], font=self.componentFont))
-            grpButtons[-1].pack(pady=8)
             trialButtons[-1].pack(pady=8)
 
         # create select/deselect all buttons
-        self.createButtons(grpFrame,self.grpVals)
         self.createButtons(trialFrame,self.trialVals)
 
 
         # Create a frame for handling all of the birds
         #======================================================================
         animalsFrame = Frame(self)
-        animalsFrame.pack(expand=True, anchor=E, side=LEFT)
-        animals = ["Bird1","Bird2","Bird3",
-                       "Bird4","Bird5", "Bird6","Bird7","Bird8"]
+        animalsFrame.pack(expand=True, anchor=CENTER, side=LEFT)
+        animals = list(allData.keys())
+
         self.animalVals = []
         animalButtons = []
         # Create a button for each bird in the data directory
@@ -243,6 +228,7 @@ class App(Frame):
             animalButtons.append(Checkbutton(animalsFrame, text=animals[bird],
                                    variable=self.animalVals[bird],
                                    font=self.componentFont))
+            self.animalVals[-1].set(1)
             animalButtons[-1].pack(pady=8)
         # create select/deselect all buttons
         self.createButtons(animalsFrame,self.animalVals)
@@ -266,22 +252,18 @@ class App(Frame):
 
 
     # function for determining which groups will be analyzed
-    def getGroups(self, buttons, keyType):
+    def getGroups(self, buttons):
         groupsForOutput = []
-        if (keyType == "trials"):
-            keys = self.trialKeys
-        else:
-            keys = self.grpKeys
 
         # check which buttons are selected
         for buttonNum in buttons:
             if buttonNum.get():
                 indexOfButton = buttons.index(buttonNum)
-                groupsForOutput.append(keys[indexOfButton])
+                groupsForOutput.append(self.trialKeys[indexOfButton])
         return groupsForOutput
 
     # function for parsing dataframe based on groups
-    def analyzeGroups(self, groups, trials):
+    def analyzeGroups(self, trials):
         outputFrames = {}
         columns = ["Pigeon Name","Trial Type","Average Dist"]
         '''if X and Y coordinates option selected
@@ -300,8 +282,11 @@ class App(Frame):
 
                 trialFrame = trialFrame.append(tempFrame) # add this pigeon to trial frame
 
-            trialFrame = trialFrame[trialFrame["Average Dist"].str.contains("No Pecks")==False]
-            outputFrames[trial] = trialFrame
+            # remove all "no pecks" from average dist
+            trialFrame = trialFrame[~trialFrame["Average Dist"].isin(["No Pecks"])==True]
+
+            # sort by group and store in list of dataframes
+            outputFrames[trial] = trialFrame.sort(['Trial Type','Pigeon Name'])
 
         return outputFrames
 
