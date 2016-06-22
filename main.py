@@ -136,8 +136,9 @@ class App(Frame):
 
     # Output the desired analyses
     def run(self):
-        trialsForOutput = self.getGroups(self.trialVals)
-        outputFrames = self.analyzeGroups(trialsForOutput)
+        trialsForOutput = self.getGroups(self.trialVals, "trials")
+        animalsForOutput = self.getGroups(self.animalVals, "animals")
+        outputFrames = self.analyzeGroups(trialsForOutput, animalsForOutput)
 
         # get the output name for saving the excel file
         todaysDate = time.strftime("%Y-%m-%d")
@@ -218,14 +219,14 @@ class App(Frame):
         #======================================================================
         animalsFrame = Frame(self)
         animalsFrame.pack(expand=True, anchor=CENTER, side=LEFT)
-        animals = list(allData.keys())
+        self.animals = list(allData.keys())
 
         self.animalVals = []
         animalButtons = []
         # Create a button for each bird in the data directory
-        for bird in range(len(animals)):
+        for bird in range(len(self.animals)):
             self.animalVals.append(IntVar())
-            animalButtons.append(Checkbutton(animalsFrame, text=animals[bird],
+            animalButtons.append(Checkbutton(animalsFrame, text=self.animals[bird],
                                    variable=self.animalVals[bird],
                                    font=self.componentFont))
             self.animalVals[-1].set(1)
@@ -250,20 +251,23 @@ class App(Frame):
         l = tk.Label(t, text="This is window #%s" % self.counter)
         l.pack(side="top", fill="both", expand=True, padx=100, pady=100)
 
-
-    # function for determining which groups will be analyzed
-    def getGroups(self, buttons):
+    # function for determining which groups/animals will be analyzed
+    def getGroups(self, buttons, groupType):
         groupsForOutput = []
+        if (groupType=="animals"):
+            keys = self.animals
+        else:
+            keys = self.trialKeys
 
         # check which buttons are selected
         for buttonNum in buttons:
             if buttonNum.get():
                 indexOfButton = buttons.index(buttonNum)
-                groupsForOutput.append(self.trialKeys[indexOfButton])
+                groupsForOutput.append(keys[indexOfButton])
         return groupsForOutput
 
     # function for parsing dataframe based on groups
-    def analyzeGroups(self, trials):
+    def analyzeGroups(self, trials, animals):
         outputFrames = {}
         columns = ["Pigeon Name","Trial Type","Average Dist"]
         '''if X and Y coordinates option selected
@@ -272,7 +276,7 @@ class App(Frame):
         for trial in trials:
             trialFrame = pd.DataFrame({}) # storage frame for each trial
             # loop over each pigeon and acquire data matching requested trials
-            for pigeon in allData:
+            for pigeon in animals:
                 tempFrame = pd.DataFrame({}) # storage frame for each pigeon
                 pigeonFrame = allData[pigeon]
 
