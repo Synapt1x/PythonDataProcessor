@@ -18,6 +18,7 @@ OUT:
 from PIL import Image, ImageTk
 from Tkinter import *
 from ttk import Frame, Style
+from HoverInfo import HoverInfo
 
 import glob
 import time
@@ -110,6 +111,21 @@ class App(Frame):
         self.pack(fill=BOTH, expand=True)
         self.createComponents()
 
+    # function for creating the select all and de-select button frames
+    def createButtons(self, frame, vals):
+            # create canvas for select all and deselect all buttons
+            grpCanv = Canvas(frame, width=220, height=10)
+            grpCanv.create_line(20,10,220,10, dash=(2,4))
+            grpCanv.pack(fill=X)
+
+            # create each button separately
+            selectAllGrps = Button(frame, text="Select All",
+                             command=lambda:
+                             self.allButtons(vals,"Select")).pack()
+            deselectAllGrps = Button(frame, text="De-Select All",
+                               command=lambda:
+                               self.allButtons(vals,"De-Select")).pack()
+
     # Callback for select all and de-select all buttons
     def allButtons(self,buttonGroup, event):
         for buttonNum in range(len(buttonGroup)):
@@ -122,7 +138,7 @@ class App(Frame):
     def run(self):
         groupsForOutput = self.getGroups(self.grpVals, "groups")
         trialsForOutput = self.getGroups(self.trialVals, "trials")
-        outputFrame = self.analyzeGroups(groupsForOutput)
+        outputFrames = self.analyzeGroups(groupsForOutput, trialsForOutput)
 
         # get the output name for saving the excel file
         todaysDate = time.strftime("%Y-%m-%d")
@@ -134,11 +150,12 @@ class App(Frame):
             writer = pd.ExcelWriter(chosenName)
 
             # create the excel writer object
-            outputFrame.to_excel(writer,sheet_name = "Main Processing")
+            for frameIndex in outputFrames:
+                outputFrames[frameIndex].to_excel(writer,sheet_name = frameIndex)
 
             print "Saving output of chosen groups and pigeons to ", chosenName
             writer.save()
-        except runtimeError:
+        except:
             print "Saving was cancelled..."
 
 
@@ -191,32 +208,25 @@ class App(Frame):
                         "Feature Only","Geometry Only","Affine"]
         self.trialKeys = ["Nrtr","C1","C2","FO","GO","AF"]
         self.trialVals = []
+
         grpButtons = []
         trialButtons = []
 
         # create all of the group buttons
         for num in range(len(self.trialLabels)):
-            self.grpVals.append(IntVar())
-            self.trialVals.append(IntVar())
             if (num < len(self.grpLabels)):
+                self.grpVals.append(IntVar())
                 grpButtons.append(Checkbutton(grpFrame, text=self.grpLabels[num],
                             variable=self.grpVals[num], font=self.componentFont))
+            self.trialVals.append(IntVar())
             trialButtons.append(Checkbutton(trialFrame, text=self.trialLabels[num],
                         variable=self.trialVals[num], font=self.componentFont))
             grpButtons[-1].pack(pady=8)
             trialButtons[-1].pack(pady=8)
 
-        grpCanv = Canvas(grpFrame, width=220, height=10)
-        grpCanv.create_line(20,10,220,10, dash=(2,4))
-        grpCanv.pack(fill=X)
-
-        # Add some select / de-select all buttons
-        selectAllGrps = Button(grpFrame, text="Select All",
-                         command=lambda:
-                         self.allButtons(self.grpVals,"Select")).pack()
-        deselectAllGrps = Button(grpFrame, text="De-Select All",
-                           command=lambda:
-                           self.allButtons(self.grpVals,"De-Select")).pack()
+        # create select/deselect all buttons
+        self.createButtons(grpFrame,self.grpVals)
+        self.createButtons(trialFrame,self.trialVals)
 
 
         # Create a frame for handling all of the birds
@@ -225,27 +235,17 @@ class App(Frame):
         animalsFrame.pack(expand=True, anchor=E, side=LEFT)
         animals = ["Bird1","Bird2","Bird3",
                        "Bird4","Bird5", "Bird6","Bird7","Bird8"]
-        animalVals = []
+        self.animalVals = []
         animalButtons = []
         # Create a button for each bird in the data directory
         for bird in range(len(animals)):
-            animalVals.append(IntVar())
+            self.animalVals.append(IntVar())
             animalButtons.append(Checkbutton(animalsFrame, text=animals[bird],
-                                   variable=animalVals[bird],
+                                   variable=self.animalVals[bird],
                                    font=self.componentFont))
             animalButtons[-1].pack(pady=8)
-        animalsCanv = Canvas(animalsFrame, width=220, height=10)
-        animalsCanv.create_line(20,10,220,10, dash=(2,4))
-        animalsCanv.pack(fill=X)
-
-        # Add some select / de-select all buttons
-        selectAllAnimals = Button(animalsFrame, text="Select All",
-                         command=lambda:
-                         self.allButtons(animalVals,"Select")).pack()
-        deselectAllAnimals = Button(animalsFrame, text="De-Select All",
-                           command=lambda:
-                           self.allButtons(animalVals,"De-Select")).pack()
-
+        # create select/deselect all buttons
+        self.createButtons(animalsFrame,self.animalVals)
 
         # Create a frame for handling all of the additional buttons
         #======================================================================
@@ -281,20 +281,29 @@ class App(Frame):
         return groupsForOutput
 
     # function for parsing dataframe based on groups
-    def analyzeGroups(self, groups):
-        outputFrame = pd.DataFrame({})
+    def analyzeGroups(self, groups, trials):
+        outputFrames = {}
+        columns = ["Pigeon Name","Trial Type","Average Dist"]
+        '''if X and Y coordinates option selected
+            columns = columns.append(["X Dist", "Y Dist"])'''
 
-        for pigeon in allData:
-            for group in groups:
+        for trial in trials:
+            trialFrame = pd.DataFrame({}) # storage frame for each trial
+            # loop over each pigeon and acquire data matching requested trials
+            for pigeon in allData:
+                tempFrame = pd.DataFrame({}) # storage frame for each pigeon
                 pigeonFrame = allData[pigeon]
-                tempFrame = pigeonFrame.loc[pigeonFrame["Trial Type"]==group][["Pigeon Name","Trial Type","Average Dist"]]
 
-                # remove NaNs and "No Pecks"
-                tempFrame = tempFrame.dropna()
-                tempFrame[tempFrame["Average Dist"].str.contains("No Peck")==False]
+                tempFrame = pigeonFrame.loc[pigeonFrame["Experiment Phase"]==trial][columns]
 
-                outputFrame = outputFrame.append(tempFrame)
-        return outputFrame
+                tempFrame = tempFrame.dropna() # remove NaNs
+
+                trialFrame = trialFrame.append(tempFrame) # add this pigeon to trial frame
+
+            trialFrame = trialFrame[trialFrame["Average Dist"].str.contains("No Pecks")==False]
+            outputFrames[trial] = trialFrame
+
+        return outputFrames
 
 # run the GUI
 app = App(root)
