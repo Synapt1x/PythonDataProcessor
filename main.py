@@ -60,7 +60,7 @@ outputFilename = path.join(dirname,"output.xls")
             raise ValueError("empty string")
         break
     except ValueError:
-        print "Please select a valid directory..."
+        tkMessageBox.showinfo("Invalid directory","Please select a valid directory...")
         """
 
 dataDirname = "C:/Users/chris/Documents/Projects/DrKellyProject/Data/"
@@ -145,7 +145,8 @@ class App(Frame):
             # get the output name for saving the excel file
             todaysDate = time.strftime("%Y-%m-%d")
             initialFileName = todaysDate + '-' + '-'.join(trialsForOutput) + ".xls"
-            chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname, initialfile=initialFileName)
+            chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname,
+                            initialfile=initialFileName)
 
             try:
                 # create excelwriter object for outputting to excel
@@ -158,9 +159,10 @@ class App(Frame):
                 print "Saving output of chosen groups and pigeons to ", chosenName
                 writer.save()
             except:
-                print "Saving was cancelled..."
+                tkMessagebox.showinfo("Saving cancelled", "Saving operation was cancelled")
         else:
-            tkMessageBox.showinfo("No groups selected","Please select at least one grouping to analyze")
+            tkMessageBox.showinfo("No groups selected",
+                            "Please select at least one grouping to analyze")
 
 
     # Create all of the buttons and components of the GUI
@@ -274,6 +276,10 @@ class App(Frame):
     def analyzeGroups(self, trials, animals):
         outputFrames = {}
         columns = ["Pigeon Name","Trial Type","Average Dist"]
+        goColumns = list(columns)
+        goColumns.extend(["Average Opp Dist"])
+        AFColumns = list(goColumns)
+        AFColumns.extend(["Average AF Dist"])
         '''if X and Y coordinates option selected
             columns = columns.append(["X Dist", "Y Dist"])'''
 
@@ -284,9 +290,15 @@ class App(Frame):
                 tempFrame = pd.DataFrame({}) # storage frame for each pigeon
                 pigeonFrame = allData[pigeon]
 
-                tempFrame = pigeonFrame.loc[pigeonFrame["Experiment Phase"]==trial][columns]
+                print pigeonFrame
 
-                tempFrame = tempFrame.dropna() # remove NaNs
+                if (trial=="GO"):
+                    tempFrame = pigeonFrame.loc[pigeonFrame["Experiment Phase"]==trial][goColumns]
+                elif (trial=="AF"):
+                    tempFrame = pigeonFrame.loc[pigeonFrame["Experiment Phase"]==trial][AFColumns]
+                else:
+                    tempFrame = pigeonFrame.loc[pigeonFrame["Experiment Phase"]==trial][columns]
+                    tempFrame = tempFrame.dropna() # remove NaNs
 
                 trialFrame = trialFrame.append(tempFrame) # add this pigeon to trial frame
 
