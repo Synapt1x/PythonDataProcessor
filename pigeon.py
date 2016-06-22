@@ -80,8 +80,12 @@ class Pigeon:
 
         # initialize placeholder series to dynamically append calc for each goal
         allDists = pd.Series([])
+        allOppDists = pd.Series([])
+        allAFDists = pd.Series([])
         removedPecks = pd.Series([])
         avgPeckDist = pd.Series([])
+        oppPeckDist = pd.Series([])
+        AFPeckDist = pd.Series([])
 
         # iterate over all goals with an index for loop number (i.e. trial num)
         for goalNum, peckIndex in peckIterator:
@@ -120,11 +124,29 @@ class Pigeon:
             # store the number of removed pecks and avg distances
             removedPecks[peckIndex] = numRemoved
 
+            # repeat the above process now for opp and AF goals
+            if (peckIndex+1 in self.OppsIndices):
+                xOppDists = xPecks.apply(lambda x: x - self.OppsX[peckIndex+1])
+                yOppDists = yPecks.apply(lambda y: y - self.OppsY[peckIndex+1])
+                (finalOppDists,OppnumRemoved,OppavgDist) = self.thresholdCalc(xOppDists,yOppDists, 40)
+                allOppDists = pd.concat([allOppDists,finalOppDists], axis=0)
+                removedPecks[peckIndex+1] = OppnumRemoved
+                oppPeckDist[peckIndex+1] = "No Pecks" if (numRemoved==10) else OppavgDist
+            if (peckIndex+2 in self.AFIndices):
+                xAFDists = xPecks.apply(lambda x: x - self.AFsX[peckIndex+2])
+                yAFDists = yPecks.apply(lambda y: y - self.AFsY[peckIndex+2])
+                (finalAFDists,AFnumRemoved,AFavgDist) = self.thresholdCalc(xAFDists,yAFDists, 40)
+                allAFDists = pd.concat([allAFDists,finalAFDists], axis=0)
+                removedPecks[peckIndex+2] = AFnumRemoved
+                AFPeckDist[peckIndex+2] = "No Pecks" if (numRemoved==10) else AFavgDist
+
             # store average peck distances, unless all pecks were removed
             avgPeckDist[peckIndex] = "No Pecks" if (numRemoved==10) else avgDist
 
         # Add all peck distances to main data frame
         self.dataframe["Dist To Main Goal"] = allDists
+        self.dataframe["Dist to Opp Goal"] = allOppDists
+        self.dataframe["Dist to AF Goal"] = allAFDists
 
         # Set all NaN"s to "goal"
         self.dataframe = self.dataframe.fillna("goal")
@@ -132,9 +154,8 @@ class Pigeon:
         # Add num of removed pecks and average peck distances
         self.dataframe["Removed Pecks"] = removedPecks
         self.dataframe["Average Dist"] = avgPeckDist
-
-    def formatOuput(self):  # method for summarizing and formatting output data
-        return "format"
+        self.dataframe["Average Opp Dist"] = oppPeckDist
+        self.dataframe["Average AF Dist"] = AFPeckDist
 
     def __init__(self, data):  # define the constructor for when pigeons are
         # made
