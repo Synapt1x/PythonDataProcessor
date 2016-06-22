@@ -15,14 +15,8 @@ OUT:
 
 """
 #import Tkinter as tk# import tk for gui
-from PIL import Image, ImageTk
 from Tkinter import *
-import tkMessageBox
 from ttk import Frame, Style
-
-import glob
-import time
-
 from os import chdir, path
 
 import pandas as pd  # import pandas data structures (DataFrame) and read_excel
@@ -31,8 +25,7 @@ import pandas as pd  # import pandas data structures (DataFrame) and read_excel
 from pigeon import Pigeon
 
 # Import for directory dialog
-import tkFileDialog
-import tkFont
+import tkFileDialog, tkMessageBox, tkFont, glob, time
 
 #=============================================================================#
 
@@ -139,8 +132,8 @@ class App(Frame):
     # Output the desired analyses
     def run(self):
         trialsForOutput = self.getGroups(self.trialVals, "trials")
-        if (trialsForOutput!=[]):
-            animalsForOutput = self.getGroups(self.animalVals, "animals")
+        animalsForOutput = self.getGroups(self.animalVals, "animals")
+        if ((trialsForOutput!=[]) and (animalsForOutput!=[])):
             outputFrames = self.analyzeGroups(trialsForOutput, animalsForOutput)
 
             # get the output name for saving the excel file
@@ -161,9 +154,15 @@ class App(Frame):
                 writer.save()
             except:
                 tkMessagebox.showinfo("Saving cancelled", "Saving operation was cancelled")
-        else:
+        elif (trialsForOutput==[] and animalsForOutput==[]):
+            tkMessageBox.showinfo("Nothing selected",
+                            "Please select something to analyze")
+        elif (trialsForOutput==[]):
             tkMessageBox.showinfo("No groups selected",
                             "Please select at least one grouping to analyze")
+        elif (animalsForOutput==[]):
+            tkMessageBox.showinfo("No birds selected",
+                            "Please select at least one bird to analyze")
 
 
     # Create all of the buttons and components of the GUI
@@ -225,7 +224,7 @@ class App(Frame):
         # Create a frame for handling all of the birds
         #======================================================================
         animalsFrame = Frame(self)
-        animalsFrame.pack(expand=True, anchor=CENTER, side=LEFT)
+        animalsFrame.pack(expand=True, anchor=CENTER, side=RIGHT)
         self.animals = list(allData.keys())
 
         self.animalVals = []
@@ -294,9 +293,9 @@ class App(Frame):
                 print pigeonFrame
 
                 if (trial=="GO"):
-                    tempFrame = pigeonFrame.loc[pigeonFrame["Experiment Phase"]==trial][goColumns]
+                    tempFrame = self.processGeometry()
                 elif (trial=="AF"):
-                    tempFrame = pigeonFrame.loc[pigeonFrame["Experiment Phase"]==trial][AFColumns]
+                    tempFrame = self.processAffine()
                 else:
                     tempFrame = pigeonFrame.loc[pigeonFrame["Experiment Phase"]==trial][columns]
                     tempFrame = tempFrame.dropna() # remove NaNs
@@ -310,6 +309,16 @@ class App(Frame):
             outputFrames[trial] = trialFrame.sort(['Trial Type','Pigeon Name'])
 
         return outputFrames
+
+    def processGeometry():
+        tempFrame = ({})
+
+        return tempFrame
+
+    def processAffine():
+        tempFrame = ({})
+
+        return tempFrame
 
 # run the GUI
 app = App(root)
