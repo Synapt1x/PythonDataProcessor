@@ -277,7 +277,7 @@ class App(Frame):
         outputFrames = {}
         columns = ["Pigeon Name","Trial Type","Average Dist"]
         goColumns = list(columns)
-        goColumns.extend(["Average Opp Dist"])
+        goColumns[-1] = "Average Opp Dist"
         AFColumns = list(goColumns)
         AFColumns.extend(["Average AF Dist"])
         '''if X and Y coordinates option selected
@@ -285,39 +285,43 @@ class App(Frame):
 
         for trial in trials:
             trialFrame = pd.DataFrame({}) # storage frame for each trial
+            gotrialFrame = pd.DataFrame({})
+            AFtrialFrame = pd.DataFrame({})
             # loop over each pigeon and acquire data matching requested trials
             for pigeon in animals:
-                tempFrame = pd.DataFrame({}) # storage frame for each pigeon
+                tempFrame = pd.DataFrame({})
                 pigeonFrame = allData[pigeon]
 
                 print pigeonFrame
 
                 if (trial=="GO"):
-                    tempFrame = self.processGeometry()
+                    goFrame = self.getFrame(pigeonFrame,goColumns, trial)
+                    gotrialFrame = gotrialFrame.append(goFrame)
                 elif (trial=="AF"):
-                    tempFrame = self.processAffine()
-                else:
-                    tempFrame = pigeonFrame.loc[pigeonFrame["Experiment Phase"]==trial][columns]
-                    tempFrame = tempFrame.dropna() # remove NaNs
+                    goFrame = self.getFrame(pigeonFrame,goColumns, trial)
+                    gotrialFrame = gotrialFrame.append(goFrame)
+                    AFFrame = self.getFrame(pigeonFrame,AFColumns, trial)
+                    AFtrialFrame = AFtrialFrame.append(AFFrame)
 
+                tempFrame = self.getFrame(pigeonFrame, columns, trial)
                 trialFrame = trialFrame.append(tempFrame) # add this pigeon to trial frame
 
-            # remove all "no pecks" from average dist
-            trialFrame = trialFrame[~trialFrame["Average Dist"].isin(["No Pecks"])==True]
-
             # sort by group and store in list of dataframes
-            outputFrames[trial] = trialFrame.sort(['Trial Type','Pigeon Name'])
+            if (trial=="GO"):
+                outputFrames["GO-Opp Distance"] = gotrialFrame.sort(["Trial Type", "Pigeon Name"])
+            elif (trial=="AF"):
+                outputFrames["AF-Opp Distance"] = gotrialFrame.sort(["Trial Type", "Pigeon Name"])
+                outputFrames["AF-AF Distance"] = AFtrialFrame.sort(["Trial Type", "Pigeon Name"])
+            outputFrames[trial] = trialFrame.sort(["Trial Type","Pigeon Name"])
 
         return outputFrames
 
-    def processGeometry():
-        tempFrame = ({})
+    # function to also create a processed dataframe for each pigeon/trial
+    def getFrame(self, pigeonFrame, columns, trial):
+        tempFrame = pigeonFrame.loc[pigeonFrame["Experiment Phase"]==trial][columns]
+        tempFrame = tempFrame.dropna()
 
-        return tempFrame
-
-    def processAffine():
-        tempFrame = ({})
-
+        tempFrame = tempFrame[~tempFrame[columns[-1]].isin(["No Pecks"])==True]
         return tempFrame
 
 # run the GUI
