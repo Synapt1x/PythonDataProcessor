@@ -14,7 +14,6 @@ IN:
 OUT:
 
 """
-#import Tkinter as tk# import tk for gui
 from Tkinter import *
 from ttk import Frame, Style
 from os import chdir, path
@@ -291,8 +290,6 @@ class App(Frame):
             for pigeon in animals:
                 tempFrame = pd.DataFrame({})
                 pigeonFrame = allData[pigeon]
-
-                print pigeonFrame
 
                 if (trial=="GO"):
                     goFrame = self.getFrame(pigeonFrame,goColumns, trial)
