@@ -14,7 +14,6 @@ IN:
 OUT:
 
 """
-#import Tkinter as tk# import tk for gui
 from Tkinter import *
 from ttk import Frame, Style
 from os import chdir, path
