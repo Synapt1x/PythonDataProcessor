@@ -1,2 +1,13 @@
 *.exe filter=lfs diff=lfs merge=lfs -text
 *.pkg filter=lfs diff=lfs merge=lfs -text
+mkl_intel_thread.dll filter=lfs diff=lfs merge=lfs -text
+QtGui4.dll filter=lfs diff=lfs merge=lfs -text
+QtCore4.dll filter=lfs diff=lfs merge=lfs -text
+QtSvg4.dll filter=lfs diff=lfs merge=lfs -text
+mfc90.dll filter=lfs diff=lfs merge=lfs -text
+python27.dll filter=lfs diff=lfs merge=lfs -text
+lxml.etree.pyd filter=lfs diff=lfs merge=lfs -text
+library.zip filter=lfs diff=lfs merge=lfs -text
+hdf5.dll filter=lfs diff=lfs merge=lfs -text
+LIBEAY32.dll filter=lfs diff=lfs merge=lfs -text
+_ssl.pyd filter=lfs diff=lfs merge=lfs -text
