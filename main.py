@@ -33,6 +33,7 @@ root.wm_title("Data Processor") # create title label
 root.geometry("840x520+300+300") # set the size of the window
 
 # Initialize variables
+currFile = 0
 pigeonName = ""
 allPigeons = {}
 allData = {}
@@ -63,6 +64,7 @@ chdir(dataDirname)
 
 # list all files of type .xls
 allFiles = glob.glob("*Test.xls")
+numFiles = len(allFiles)
 
 # create excelwriter object for outputting all data to excel
 allWriter = pd.ExcelWriter(outputFilename)
@@ -85,8 +87,18 @@ for file in allFiles:
     # create pigeon
     allPigeons[pigeonName] = Pigeon(pigeonData)
 
+print "Processing %2.0f data files, please wait..." % numFiles
+
+startTime = time.time() # start timer
+progressTime = startTime
+
 # loop through all of the pigeons loaded into the dictionary allPigeons
 for pigeonName, pigeon in allPigeons.iteritems():
+    currFile += 1
+    if ((time.time() - progressTime) > 5): # display progress
+        progressTime = time.time() # update progress time
+        print "%0.0f/%2.0f..." % (currFile,numFiles)
+
     # find the indices of the goal locations in (x,y)
     pigeon.calcDist()
 
@@ -95,6 +107,14 @@ for pigeonName, pigeon in allPigeons.iteritems():
 
     # also save each pigeon data to a dictionary for GUI processing
     allData[pigeonName]=pigeon.dataframe
+
+print "%2.0f/%2.0f..." % (numFiles, numFiles)
+
+stopTime = time.time() # stop timer
+processingTime = stopTime - startTime # calculate time for full processing
+
+print "Processing the selected data files took %5.2f seconds." % processingTime
+print "\nFormatted output of all selected data files located in " + outputFilename + '.'
 
 class App(Frame):
 
