@@ -12,10 +12,10 @@ build_exe_options = {
 "include_files": []}
 
 setup(
-    name = "simple",
+    name = "Pigeon Data Processor",
     version = "0.1",
-    description = "",
-    author = "Dengar",
+    description = "Program used to process experimental data from studies run on pigeons involving a comparison on peck location with relation to a goal target in geometry and feature driven learning environments.",
+    author = "Chris Cadonic",
     options = {"build_exe": build_exe_options},
-    executables = [Executable("simple.py")]
+    executables = [Executable("main.py")]
 )
