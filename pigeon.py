@@ -71,7 +71,7 @@ class Pigeon:
 
         return (finalDists,numsAboveThreshold,avgDist)
 
-    def calcDist(self):  # method for calculating euclidean distance from goals
+    def calcDist(self, threshold):  # method for calculating euclidean distance from goals
         # call findGoals to determine the (x,y,indices) of the goals
         (self.goalsX, self.goalsY, self.goalIndices) = self.findGoals("goal")
         (self.OppsX, self.OppsY, self.OppsIndices) = self.findGoals("Opp goal")
@@ -118,7 +118,7 @@ class Pigeon:
 
             # Calculate the Euclidean distance for each peck from goal
             # Also filter out distances above distance threshold
-            (finalDists,numRemoved,avgDist) = self.thresholdCalc(xDists,yDists, 40)
+            (finalDists,numRemoved,avgDist) = self.thresholdCalc(xDists,yDists, threshold)
 
             # store all distances in Series to be added to data frame
             allDists = pd.concat([allDists,finalDists], axis=0)
