@@ -237,7 +237,9 @@ element within the GUI.\n\n"
                 printInfo(processingTime, outputFilename)
         except:
             tkMessageBox.showinfo("Not a number","Please enter a valid number")
-
+            thresholdBox.delete(0,END)
+            thresholdBox.insert(0,defaultThreshold)
+            
 
     # Create all of the buttons and components of the GUI
     def createComponents(self):
