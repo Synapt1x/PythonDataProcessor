@@ -13,3 +13,4 @@ LIBEAY32.dll filter=lfs diff=lfs merge=lfs -text
 _ssl.pyd filter=lfs diff=lfs merge=lfs -text
 PyQt4.QtGui.pyd filter=lfs diff=lfs merge=lfs -text
 PyQt4.QtCore.pyd filter=lfs diff=lfs merge=lfs -text
+build/exe.win-amd64-2.7/dataProcessor.exe filter=lfs diff=lfs merge=lfs -text
