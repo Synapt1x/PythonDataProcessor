@@ -38,8 +38,9 @@ root.wm_title("Data Processor") # create title label
 root.geometry("840x520+300+300") # set the size of the window
 
 # Initialize variables
-currFile = 0
 toolTipDelay = 700 #ms
+defaultThreshold = 50
+outputFilename = ""
 pigeonName = ""
 allPigeons = {}
 allData = {}
@@ -50,9 +51,6 @@ animalButtons = []
 
 # locate the current directory and file location
 dirname, mainFile = path.split(path.abspath("__file__"))
-
-# define the output spreadsheet
-outputFilename = path.join(dirname,"output.xls")
 
 # Ask user to identify the data directory
 """while True:
@@ -76,7 +74,7 @@ allFiles = glob.glob("*Test.xls")
 numFiles = len(allFiles)
 
 # create excelwriter object for outputting all data to excel
-allWriter = pd.ExcelWriter(outputFilename)
+#allWriter = pd.ExcelWriter(outputFilename)
 
 # First read-in the data
 for file in allFiles:
@@ -96,39 +94,46 @@ for file in allFiles:
     # create pigeon
     allPigeons[pigeonName] = Pigeon(pigeonData)
 
-print "Processing %1.0f data files, please wait..." % numFiles
+def analyzePigeons(calcForThreshold, path):
+    print "\nProcessing %1.0f data files with a threshold of %0.0f units, \
+please wait..." % (numFiles, calcForThreshold)
 
-startTime = time.time() # start timer
-progressTime = startTime
+    startTime = time.time() # start timer
+    progressTime = startTime
+    # define the output spreadsheet
+    outputFilename = path.join(dirname,"output-threshold-%0.0f.xls" % calcForThreshold)
 
-# loop through all of the pigeons loaded into the dictionary allPigeons
-for pigeonName, pigeon in allPigeons.iteritems():
-    currFile += 1
-    if ((time.time() - progressTime) > 5): # display progress
-        progressTime = time.time() # update progress time
+    allWriter = pd.ExcelWriter(outputFilename)
+    currFile = 0
+    progressTime = 0
+    # loop through all of the pigeons loaded into the dictionary allPigeons
+    for pigeonName, pigeon in allPigeons.iteritems():
+        currFile += 1
+        if ((time.time() - progressTime) > 5): # display progress
+            progressTime = time.time() # update progress time
+
+        # find the indices of the goal locations in (x,y)
+        pigeon.calcDist(calcForThreshold)
+
+        # use the excel writer to save this pigeon to a data sheet in output.xls
+        pigeon.dataframe.to_excel(allWriter,sheet_name = pigeonName)
         print "Progress: %0.0f/%0.0f..." % (currFile,numFiles)
 
-    # find the indices of the goal locations in (x,y)
-    pigeon.calcDist()
+        # also save each pigeon data to a dictionary for GUI processing
+        allData[pigeonName]=pigeon.dataframe
 
-    # use the excel writer to save this pigeon to a data sheet in output.xls
-    pigeon.dataframe.to_excel(allWriter,sheet_name = pigeonName)
+    # also calculate how long formatting takes
+    processingTime = time.time() - startTime
 
-    # also save each pigeon data to a dictionary for GUI processing
-    allData[pigeonName]=pigeon.dataframe
+    return (outputFilename, processingTime)
 
-print "%0.0f/%0.0f..." % (numFiles, numFiles)
+def printInfo(processingTime,outputFilename):
+    print "Processing the selected data files took %1.2f seconds." % processingTime
+    print "\nFormatted output of all selected data files located in " + outputFilename + '.'
 
-stopTime = time.time() # stop timer
-processingTime = stopTime - startTime # calculate time for full processing
-
-print "Processing the selected data files took %1.2f seconds." % processingTime
-print "\nFormatted output of all selected data files located in " + outputFilename + '.'
-
-print "\nTips for using the GUI of this program can be found in the supplied \
-README file. Tooltips are also available upon hovering over any \
-element within the GUI."
-
+#=============================================================================#
+#==========main function for handling processing and GUI functions============#
+#=============================================================================#
 class App(Frame):
 
     # Constructor
@@ -136,6 +141,15 @@ class App(Frame):
         Frame.__init__(self, parent)
 
         self.pack(fill=BOTH, expand=True)
+        # run the initial formatting on the data folder
+        (outputFilename,processingTime) = analyzePigeons(defaultThreshold, path)
+
+        printInfo(processingTime,outputFilename)
+
+        print "\nTips for using the GUI of this program can be found in the supplied \
+README file. Tooltips are also available upon hovering over any \
+element within the GUI."
+
         self.createComponents()
 
     # function for creating the select all and de-select button frames
@@ -204,6 +218,18 @@ class App(Frame):
         elif (animalsForOutput==[]):
             tkMessageBox.showinfo("No birds selected",
                             "Please select at least one bird to analyze")
+
+    def checkReformat(self, value, reset=False): # re-run if threshold has been changed
+        if (value==defaultThreshold and reset):
+            print "Threshold has not changed from default."
+        else:
+            (outputFilename, processingTime) = analyzePigeons(value,path)
+            printInfo(processingTime, outputFilename)
+
+    def resetFormat(self, thresholdBox): # reset back to default
+        thresholdBox.delete(0,END)
+        thresholdBox.insert(0,defaultThreshold)
+        self.checkReformat(int(thresholdBox.get()), reset=True)
 
 
     # Create all of the buttons and components of the GUI
@@ -292,16 +318,44 @@ long wall."]
         # create select/deselect all buttons
         self.createButtons(animalsFrame,self.animalVals, "animals")
 
-
-        #selectTrialToolTip = ToolTip(trialSelect, delay=toolTipDelay,
-        #            text="Select all animals for analysis.")
-        #deselectTrialToolTip = ToolTip(trialDeselect, delay=toolTipDelay,
-        #            text="Deselect all animals marked for analysis.")
-
         # Create a frame for handling all of the additional buttons
         #======================================================================
         buttonsFrame = Frame(self)
         buttonsFrame.pack(fill=X, expand=True)
+
+        # Threshold label
+        thresholdLabel = Label(buttonsFrame, text="Change threshold: ")
+
+        # Threshold entry box
+        thresholdBox = Entry(buttonsFrame, width=10)
+        thresholdBox.pack()
+        thresholdBox.insert(0, defaultThreshold)
+        thresholdBoxTooltip = ToolTip(thresholdBox, delay=toolTipDelay,
+                    text="Change this value to set a new threshold value \
+for calculating the max distance away from a goal to be kept for data analysis.")
+
+        # Re-analyze with new thresholdBox
+        reformatButton = Button(buttonsFrame, text="Apply new threshold",
+                    command=lambda: self.checkReformat(int(thresholdBox.get()), False))
+        reformatButton.pack()
+        reformatTooltip = ToolTip(reformatButton, delay=toolTipDelay,
+                    text="Click to apply any changes to threshold box above.")
+
+        # Reset threshold to defaultThreshold
+        resetButton = Button(buttonsFrame, text="Reset threshold and run",
+                    command=lambda: self.resetFormat(thresholdBox))
+        resetButton.pack()
+        resetButtonTooltip = ToolTip(resetButton, delay=toolTipDelay,
+                    text="Click to reset threshold to default value.")
+
+        # Create a sort button
+        self.sortOutput = IntVar()
+        sortButton = Checkbutton(buttonsFrame, text="Sort",
+                    variable=self.sortOutput,font=self.componentFont)
+        sortButton.pack()
+        sortTooltip = ToolTip(sortButton, delay=toolTipDelay,
+                    text="Select to auto-sort the output excel spreadsheets by \
+trial type.")
 
         # Create a quit button
         quitButton = Button(buttonsFrame, text="Quit", command=self.quit)
@@ -331,6 +385,21 @@ long wall."]
                 indexOfButton = buttons.index(buttonNum)
                 groupsForOutput.append(keys[indexOfButton])
         return groupsForOutput
+
+    # sort by group and store in list of dataframes
+    def sortByTrialType(self, trial, gotrialFrame, AFtrialFrame, trialFrame, outputFrames):
+        if (trial=="GO"):
+            outputFrames["GO-Opp Distance"] = gotrialFrame.sort_values(["Trial Type",
+            "Pigeon Name"])
+        elif (trial=="AF"):
+            outputFrames["AF-Opp Distance"] = gotrialFrame.sort_values(["Trial Type",
+            "Pigeon Name"])
+            outputFrames["AF-AF Distance"] = AFtrialFrame.sort_values(["Trial Type",
+            "Pigeon Name"])
+        outputFrames[trial] = trialFrame.sort_values(["Trial Type","Pigeon Name"])
+
+        return outputFrames
+
 
     # function for parsing dataframe based on groups
     def analyzeGroups(self, trials, animals):
@@ -364,15 +433,12 @@ long wall."]
                 tempFrame = self.getFrame(pigeonFrame, columns, trial)
                 trialFrame = trialFrame.append(tempFrame) # add this pigeon to trial frame
 
-            # sort by group and store in list of dataframes
-            if (trial=="GO"):
-                outputFrames["GO-Opp Distance"] = gotrialFrame.sort(["Trial Type", "Pigeon Name"])
-            elif (trial=="AF"):
-                outputFrames["AF-Opp Distance"] = gotrialFrame.sort(["Trial Type", "Pigeon Name"])
-                outputFrames["AF-AF Distance"] = AFtrialFrame.sort(["Trial Type", "Pigeon Name"])
-            outputFrames[trial] = trialFrame.sort(["Trial Type","Pigeon Name"])
+            if (self.sortOutput.get()): # sort if the sort checkbutton is selected
+                outputFrames[trial] = self.sortByTrialType(trial, gotrialFrame,
+                            AFtrialFrame, trialFrame, outputFrames)
 
         return outputFrames
+
 
     # function to also create a processed dataframe for each pigeon/trial
     def getFrame(self, pigeonFrame, columns, trial):
