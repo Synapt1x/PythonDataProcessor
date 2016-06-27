@@ -23,6 +23,11 @@ import pandas as pd  # import pandas data structures (DataFrame) and read_excel
 # Import module with class/functions
 from pigeon import Pigeon
 
+# Import tool tip function developed by Michael Lange at
+# http://tkinter.unpythonic.net/wiki/ToolTip, Licensed under
+# GNU General Public License, Ver 2
+from ToolTip import ToolTip
+
 # Import for directory dialog
 import tkFileDialog, tkMessageBox, tkFont, glob, time
 
@@ -34,6 +39,7 @@ root.geometry("840x520+300+300") # set the size of the window
 
 # Initialize variables
 currFile = 0
+toolTipDelay = 500 #ms
 pigeonName = ""
 allPigeons = {}
 allData = {}
@@ -115,6 +121,10 @@ processingTime = stopTime - startTime # calculate time for full processing
 
 print "Processing the selected data files took %1.2f seconds." % processingTime
 print "\nFormatted output of all selected data files located in " + outputFilename + '.'
+
+print "\nTips for using the GUI of this program can be found in the supplied \
+README file. Tooltips are also available upon hovering over any \
+element within the GUI."
 
 class App(Frame):
 
