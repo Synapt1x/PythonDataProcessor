@@ -136,19 +136,28 @@ class App(Frame):
         self.createComponents()
 
     # function for creating the select all and de-select button frames
-    def createButtons(self, frame, vals):
-            # create canvas for select all and deselect all buttons
-            trialCanv = Canvas(frame, width=220, height=10)
-            trialCanv.create_line(20,10,220,10, dash=(2,4))
-            trialCanv.pack(fill=X)
+    def createButtons(self, frame, vals, text):
+        # create canvas for select all and deselect all buttons
+        canv = Canvas(frame, width=220, height=10)
+        canv.create_line(20,10,220,10, dash=(2,4))
+        canv.pack(fill=X)
 
-            # create each button separately
-            selectAll = Button(frame, text="Select All",
-                             command=lambda:
-                             self.allButtons(vals,"Select")).pack()
-            deselectAll = Button(frame, text="De-Select All",
-                               command=lambda:
-                               self.allButtons(vals,"De-Select")).pack()
+        # create each button separately
+        selectAll = Button(frame, text="Select All",
+                        command=lambda:
+                        self.allButtons(vals,"Select"))
+        selectAll.pack()
+        selectTrialToolTip = ToolTip(selectAll, delay=toolTipDelay,
+                    text="Select all " + text + " for analysis.")
+        deselectAll = Button(frame, text="De-Select All",
+                       command=lambda:
+                       self.allButtons(vals,"De-Select"))
+        deselectAll.pack()
+        deselectTrialToolTip = ToolTip(deselectAll, delay=toolTipDelay,
+                    text="Deselect all " + text + " marked for analysis.")
+
+        return (selectAll, deselectAll)
+
 
     # Callback for select all and de-select all buttons
     def allButtons(self,buttonGroup, event):
@@ -224,6 +233,9 @@ class App(Frame):
         # Create a run button
         runButton = Button(footerFrame, width=200,text="Run Processing", command=self.run)
         runButton.pack(fill=Y)
+        runToolTip = ToolTip(runButton,delay=toolTipDelay,
+                    text = "Run analysis based on the groups and animals\
+                    selected above.")
 
 
         # Create and populate group and trial button frames
@@ -247,8 +259,7 @@ class App(Frame):
             trialButtons[-1].pack(pady=8)
 
         # create select/deselect all buttons
-        self.createButtons(trialFrame,self.trialVals)
-
+        self.createButtons(trialFrame,self.trialVals, "experimental phases")
 
         # Create a frame for handling all of the birds
         #======================================================================
@@ -267,7 +278,13 @@ class App(Frame):
             self.animalVals[-1].set(1)
             animalButtons[-1].pack(pady=8)
         # create select/deselect all buttons
-        self.createButtons(animalsFrame,self.animalVals)
+        self.createButtons(animalsFrame,self.animalVals, "animals")
+
+
+        #selectTrialToolTip = ToolTip(trialSelect, delay=toolTipDelay,
+        #            text="Select all animals for analysis.")
+        #deselectTrialToolTip = ToolTip(trialDeselect, delay=toolTipDelay,
+        #            text="Deselect all animals marked for analysis.")
 
         # Create a frame for handling all of the additional buttons
         #======================================================================
@@ -277,6 +294,8 @@ class App(Frame):
         # Create a quit button
         quitButton = Button(buttonsFrame, text="Quit", command=self.quit)
         quitButton.pack()
+        quitToolTip = ToolTip(quitButton, delay=toolTipDelay,
+                    text="Quit the program and close the GUI.")
 
 
     def create_window(self):
