@@ -39,11 +39,14 @@ root.geometry("840x520+300+300") # set the size of the window
 
 # Initialize variables
 currFile = 0
-toolTipDelay = 500 #ms
+toolTipDelay = 700 #ms
 pigeonName = ""
 allPigeons = {}
 allData = {}
 groupsForOutput = []
+trialButtons = []
+trialButtonTooltips = []
+animalButtons = []
 
 # locate the current directory and file location
 dirname, mainFile = path.split(path.abspath("__file__"))
@@ -218,6 +221,9 @@ class App(Frame):
         title_label = Label(titleFrame, text="Data Processor For Pigeon Experiment",
                             font=self.titleFont)
         title_label.pack(fill=X, expand=True)
+        title_labelTooltip = ToolTip(title_label, delay=toolTipDelay+500,
+                    text="This program was created by Chris Cadonic for use \
+                    by the laboratory of Dr. Debbie Kelly.")
 
         # Create a canvas for drawing a separation line
         canv = Canvas(titleFrame, width=840, height=10)
@@ -247,9 +253,13 @@ class App(Frame):
         self.trialLabels = ["Non-reinforced training","Control 1", "Control 2",
                         "Feature Only","Geometry Only","Affine"]
         self.trialKeys = ["Nrtr","C1","C2","FO","GO","AF"]
+        self.trialTooltips = ["Non-reinforced training group.", "Control group 1",
+                        "Control group 2", "Group where an extra wall and a \
+feature wall are placed in the environment to create an enclosed square.",
+"Group where the feature wall is removed, but the geometry of the environment \
+remains the same.", "Group where the feature wall is moved to the end of the \
+long wall."]
         self.trialVals = []
-
-        trialButtons = []
 
         # create all of the group buttons
         for num in range(len(self.trialLabels)):
@@ -257,6 +267,8 @@ class App(Frame):
             trialButtons.append(Checkbutton(trialFrame, text=self.trialLabels[num],
                         variable=self.trialVals[num], font=self.componentFont))
             trialButtons[-1].pack(pady=8)
+            trialButtonTooltips.append(ToolTip(trialButtons[-1],
+                        delay=toolTipDelay, text=self.trialTooltips[num]))
 
         # create select/deselect all buttons
         self.createButtons(trialFrame,self.trialVals, "experimental phases")
@@ -268,7 +280,7 @@ class App(Frame):
         self.animals = list(allData.keys())
 
         self.animalVals = []
-        animalButtons = []
+
         # Create a button for each bird in the data directory
         for bird in range(len(self.animals)):
             self.animalVals.append(IntVar())
