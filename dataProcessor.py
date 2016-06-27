@@ -52,6 +52,7 @@ animalButtons = []
 # locate the current directory and file location
 dirname, mainFile = path.split(path.abspath("__file__"))
 
+#### uncomment in final version
 # Ask user to identify the data directory
 """while True:
     try:
@@ -63,7 +64,7 @@ dirname, mainFile = path.split(path.abspath("__file__"))
     except ValueError:
         tkMessageBox.showinfo("Invalid directory","Please select a valid directory...")
         """
-
+#### remove in final version
 dataDirname = "C:/Users/chris/Documents/Projects/DrKellyProject/Data/"
 
 # cd to data directory
@@ -121,6 +122,8 @@ please wait..." % (numFiles, calcForThreshold)
 
         # also save each pigeon data to a dictionary for GUI processing
         allData[pigeonName]=pigeon.dataframe
+    #### Uncomment in final version
+    #allWriter.save()
 
     # also calculate how long formatting takes
     processingTime = time.time() - startTime
@@ -148,7 +151,7 @@ class App(Frame):
 
         print "\nTips for using the GUI of this program can be found in the supplied \
 README file. Tooltips are also available upon hovering over any \
-element within the GUI."
+element within the GUI.\n\n"
 
         self.createComponents()
 
@@ -219,20 +222,21 @@ element within the GUI."
             tkMessageBox.showinfo("No birds selected",
                             "Please select at least one bird to analyze")
 
-    def checkReformat(self, value, reset): # re-run if threshold has been changed
-        if (value,reset)==(defaultThreshold,False):
-            print "Threshold has not changed from default."
-        elif (value,reset)==(defaultThreshold,True):
-            (outputFilename, processingTime) = analyzePigeons(defaultThreshold,path)
-            printInfo(processingTime, outputFilename)
-        else:
-            (outputFilename, processingTime) = analyzePigeons(value,path)
-            printInfo(processingTime, outputFilename)
+    def checkReformat(self, thresholdBox, reset): # re-run if threshold has been changed
+        if reset==True:
+            thresholdBox.delete(0,END)
+            thresholdBox.insert(0,defaultThreshold)
 
-    def resetFormat(self, thresholdBox): # reset back to default
-        thresholdBox.delete(0,END)
-        thresholdBox.insert(0,defaultThreshold)
-        self.checkReformat(defaultThreshold, reset=True)
+        try:
+            value = float(thresholdBox.get())
+
+            if (value,reset)==(defaultThreshold,False):
+                print "Threshold has not changed from default."
+            else:
+                (outputFilename, processingTime) = analyzePigeons(value,path)
+                printInfo(processingTime, outputFilename)
+        except:
+            tkMessageBox.showinfo("Not a number","Please enter a valid number")
 
 
     # Create all of the buttons and components of the GUI
@@ -339,14 +343,14 @@ for calculating the max distance away from a goal to be kept for data analysis."
 
         # Re-analyze with new thresholdBox
         reformatButton = Button(buttonsFrame, text="Apply new threshold",
-                    command=lambda: self.checkReformat(float(thresholdBox.get()), False))
+                    command=lambda: self.checkReformat(thresholdBox, False))
         reformatButton.pack()
         reformatTooltip = ToolTip(reformatButton, delay=toolTipDelay,
                     text="Click to apply any changes to threshold box above.")
 
         # Reset threshold to defaultThreshold
         resetButton = Button(buttonsFrame, text="Reset threshold and run",
-                    command=lambda: self.resetFormat(thresholdBox))
+                    command=lambda: self.checkReformat(thresholdBox, True))
         resetButton.pack()
         resetButtonTooltip = ToolTip(resetButton, delay=toolTipDelay,
                     text="Click to reset threshold to default value.")
