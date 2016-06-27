@@ -219,9 +219,12 @@ element within the GUI."
             tkMessageBox.showinfo("No birds selected",
                             "Please select at least one bird to analyze")
 
-    def checkReformat(self, value, reset=False): # re-run if threshold has been changed
-        if (value==defaultThreshold and reset):
+    def checkReformat(self, value, reset): # re-run if threshold has been changed
+        if (value,reset)==(defaultThreshold,False):
             print "Threshold has not changed from default."
+        elif (value,reset)==(defaultThreshold,True):
+            (outputFilename, processingTime) = analyzePigeons(defaultThreshold,path)
+            printInfo(processingTime, outputFilename)
         else:
             (outputFilename, processingTime) = analyzePigeons(value,path)
             printInfo(processingTime, outputFilename)
@@ -229,7 +232,7 @@ element within the GUI."
     def resetFormat(self, thresholdBox): # reset back to default
         thresholdBox.delete(0,END)
         thresholdBox.insert(0,defaultThreshold)
-        self.checkReformat(int(thresholdBox.get()), reset=True)
+        self.checkReformat(defaultThreshold, reset=True)
 
 
     # Create all of the buttons and components of the GUI
@@ -336,7 +339,7 @@ for calculating the max distance away from a goal to be kept for data analysis."
 
         # Re-analyze with new thresholdBox
         reformatButton = Button(buttonsFrame, text="Apply new threshold",
-                    command=lambda: self.checkReformat(int(thresholdBox.get()), False))
+                    command=lambda: self.checkReformat(float(thresholdBox.get()), False))
         reformatButton.pack()
         reformatTooltip = ToolTip(reformatButton, delay=toolTipDelay,
                     text="Click to apply any changes to threshold box above.")
