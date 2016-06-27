@@ -87,7 +87,7 @@ for file in allFiles:
     # create pigeon
     allPigeons[pigeonName] = Pigeon(pigeonData)
 
-print "Processing %2.0f data files, please wait..." % numFiles
+print "Processing %1.0f data files, please wait..." % numFiles
 
 startTime = time.time() # start timer
 progressTime = startTime
@@ -97,7 +97,7 @@ for pigeonName, pigeon in allPigeons.iteritems():
     currFile += 1
     if ((time.time() - progressTime) > 5): # display progress
         progressTime = time.time() # update progress time
-        print "%0.0f/%2.0f..." % (currFile,numFiles)
+        print "Progress: %0.0f/%0.0f..." % (currFile,numFiles)
 
     # find the indices of the goal locations in (x,y)
     pigeon.calcDist()
@@ -108,12 +108,12 @@ for pigeonName, pigeon in allPigeons.iteritems():
     # also save each pigeon data to a dictionary for GUI processing
     allData[pigeonName]=pigeon.dataframe
 
-print "%2.0f/%2.0f..." % (numFiles, numFiles)
+print "%0.0f/%0.0f..." % (numFiles, numFiles)
 
 stopTime = time.time() # stop timer
 processingTime = stopTime - startTime # calculate time for full processing
 
-print "Processing the selected data files took %5.2f seconds." % processingTime
+print "Processing the selected data files took %1.2f seconds." % processingTime
 print "\nFormatted output of all selected data files located in " + outputFilename + '.'
 
 class App(Frame):
