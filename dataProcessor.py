@@ -134,7 +134,7 @@ please wait..." % (numFiles, calcForThreshold)
     processingTime = time.time() - startTime
 
     try:
-        #allWriter.save() #### uncomment in the final version
+        allWriter.save()
         printInfo(processingTime,outputFilename)
     except:
         print "Processing the selected data files took %1.2f seconds." % processingTime
