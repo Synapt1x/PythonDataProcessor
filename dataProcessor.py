@@ -8,11 +8,6 @@ This program was developed to automatically
 format input excel data for statistical
 analysis in the statistical analysis
 software.
-
-IN:
-
-OUT:
-
 """
 from Tkinter import *
 from ttk import Frame, Style
@@ -95,6 +90,10 @@ for file in allFiles:
     # create pigeon
     allPigeons[pigeonName] = Pigeon(pigeonData)
 
+def printInfo(processingTime,outputFilename):
+    print "Processing the selected data files took %1.2f seconds." % processingTime
+    print "\nFormatted output of all selected data files located in " + outputFilename + '.'
+
 def analyzePigeons(calcForThreshold, path):
     print "\nProcessing %1.0f data files with a threshold of %0.0f units, \
 please wait..." % (numFiles, calcForThreshold)
@@ -122,17 +121,23 @@ please wait..." % (numFiles, calcForThreshold)
 
         # also save each pigeon data to a dictionary for GUI processing
         allData[pigeonName]=pigeon.dataframe
-    #### Uncomment in final version
-    allWriter.save()
 
     # also calculate how long formatting takes
     processingTime = time.time() - startTime
 
-    return (outputFilename, processingTime)
+    try:
+        #allWriter.save() #### uncomment in the final version
+        printInfo(processingTime,outputFilename)
+    except:
+        print "Processing the selected data files took %1.2f seconds." % processingTime
+        tkMessageBox.showinfo("Initial processing output cancelled", "Although \
+processing of the selected data files occurred as usual, there was an issue \
+writing to the designated excel file. Check to make sure it is not currently \
+in use. Since processing will not likely change for the same threshold values, \
+this may not be an issue. Saving the output of initial data processing was \
+cancelled.")
 
-def printInfo(processingTime,outputFilename):
-    print "Processing the selected data files took %1.2f seconds." % processingTime
-    print "\nFormatted output of all selected data files located in " + outputFilename + '.'
+
 
 #=============================================================================#
 #==========main function for handling processing and GUI functions============#
@@ -145,9 +150,7 @@ class App(Frame):
 
         self.pack(fill=BOTH, expand=True)
         # run the initial formatting on the data folder
-        (outputFilename,processingTime) = analyzePigeons(defaultThreshold, path)
-
-        printInfo(processingTime,outputFilename)
+        analyzePigeons(defaultThreshold, path)
 
         print "\nTips for using the GUI of this program can be found in the supplied \
 README file. Tooltips are also available upon hovering over any \
@@ -203,25 +206,30 @@ element within the GUI.\n\n"
             try:
                 # create excelwriter object for outputting to excel
                 writer = pd.ExcelWriter(chosenName)
+            except:
+                tkMessageBox.showinfo("Saving cancelled", "No output file name \
+was selected. Saving operation cancelled.")
 
-                # create the excel writer object
-                for frameIndex in outputFrames:
-                    outputFrames[frameIndex].to_excel(writer,sheet_name = frameIndex)
-
+            # create the excel writer object
+            for frameIndex in outputFrames:
+                outputFrames[frameIndex].to_excel(writer,sheet_name = frameIndex)
+                
+            try:
                 writer.save()
                 print "Saving output of chosen groups and pigeons to ", chosenName
             except:
-                tkMessageBox.showinfo("Saving cancelled", "Sorry, there was an \
-error--Saving operation was cancelled")
+                tkMessageBox.showinfo("Saving cancelled", "Sorry there as an \
+issue writing to the designated excel file. Check to make sure it is not \
+currently in use. Saving operation cancelled.")
         elif (trialsForOutput==[] and animalsForOutput==[]):
             tkMessageBox.showinfo("Nothing selected",
-                            "Please select something to analyze")
+                            "Please select something to analyze.")
         elif (trialsForOutput==[]):
             tkMessageBox.showinfo("No groups selected",
-                            "Please select at least one grouping to analyze")
+                            "Please select at least one grouping to analyze.")
         elif (animalsForOutput==[]):
             tkMessageBox.showinfo("No birds selected",
-                            "Please select at least one bird to analyze")
+                            "Please select at least one bird to analyze.")
 
     def checkReformat(self, thresholdBox, reset): # re-run if threshold has been changed
         value = float(thresholdBox.get())
@@ -235,10 +243,9 @@ error--Saving operation was cancelled")
                 thresholdBox.insert(0,defaultThreshold)
                 value = defaultThreshold
 
-            (outputFilename, processingTime) = analyzePigeons(value,path)
-            printInfo(processingTime, outputFilename)
+            analyzePigeons(value,path)
         except:
-            tkMessageBox.showinfo("Not a number","Please enter a valid number")
+            tkMessageBox.showinfo("Not a number","Please enter a valid number.")
             thresholdBox.delete(0,END)
             thresholdBox.insert(0,defaultThreshold)
 
@@ -260,7 +267,7 @@ error--Saving operation was cancelled")
         title_label.pack(fill=X, expand=True)
         title_labelTooltip = ToolTip(title_label, delay=toolTipDelay+500,
                     text="This program was created by Chris Cadonic for use \
-                    by the laboratory of Dr. Debbie Kelly.")
+                    in the laboratory of Dr. Debbie Kelly.")
 
         # Create a canvas for drawing a separation line
         canv = Canvas(titleFrame, width=840, height=10)
@@ -430,14 +437,20 @@ trial type.")
                 trialFrame = trialFrame.append(tempFrame) # add this pigeon to trial frame
 
             # sort by group and store in list of dataframes if selected to
-            #if (self.sortOutput==1):
-
-            if (trial=="GO"):
-                outputFrames["GO-Opp Distance"] = gotrialFrame.sort(["Trial Type", "Pigeon Name"])
-            elif (trial=="AF"):
-                outputFrames["AF-Opp Distance"] = gotrialFrame.sort(["Trial Type", "Pigeon Name"])
-                outputFrames["AF-AF Distance"] = AFtrialFrame.sort(["Trial Type", "Pigeon Name"])
-            outputFrames[trial] = trialFrame.sort(["Trial Type","Pigeon Name"])
+            if (self.sortOutput==1):
+                if (trial=="GO"):
+                    outputFrames["GO-Opp Distance"] = gotrialFrame.sort(["Trial Type", "Pigeon Name"])
+                elif (trial=="AF"):
+                    outputFrames["AF-Opp Distance"] = gotrialFrame.sort(["Trial Type", "Pigeon Name"])
+                    outputFrames["AF-AF Distance"] = AFtrialFrame.sort(["Trial Type", "Pigeon Name"])
+                outputFrames[trial] = trialFrame.sort(["Trial Type","Pigeon Name"])
+            else:
+                if (trial=="GO"):
+                    outputFrames["GO-Opp Distance"] = gotrialFrame
+                elif (trial=="AF"):
+                    outputFrames["AF-Opp Distance"] = gotrialFrame
+                    outputFrames["AF-AF Distance"] = AFtrialFrame
+                outputFrames[trial] = trialFrame
 
         return outputFrames
 
