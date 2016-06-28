@@ -47,9 +47,18 @@ animalButtons = []
 # locate the current directory and file location
 dirname, mainFile = path.split(path.abspath("__file__"))
 
-#### uncomment in final version
 # Ask user to identify the data directory
-"""while True:
+numErrors = 0
+while True:
+    if (numErrors > 4):
+        result = tkMessageBox.askyesno(title="Quit?",message="No directory \
+selected over multipled attempts. Do you want to quit instead?")
+        if (result == True):
+            print "Exiting program..."
+            exit()
+        else:
+            numError = 0
+            break
     try:
         dataDirname = tkFileDialog.askdirectory(parent=root,
             initialdir="/",title="Please select the data directory.")
@@ -57,10 +66,9 @@ dirname, mainFile = path.split(path.abspath("__file__"))
             raise ValueError("empty string")
         break
     except ValueError:
-        tkMessageBox.showinfo("Invalid directory","Please select a valid directory...")
-        """
-#### remove in final version
-dataDirname = "C:\\Users\\chris\\Documents\\Projects\\DrKellyProject\\Data\\"
+        numErrors += 1
+        tkMessageBox.showinfo("Invalid directory - Failed \
+attempt %0.0f/5" % numErrors,"Please select a valid directory...")
 
 # cd to data directory
 chdir(dataDirname)
