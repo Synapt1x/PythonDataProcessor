@@ -20,7 +20,7 @@ from os import chdir, path
 
 import pandas as pd  # import pandas data structures (DataFrame) and read_excel
 
-# Import module with class/functions
+# Import module with class/functions handling pigeon procesing
 from pigeon import Pigeon
 
 # Import tool tip function developed by Michael Lange at
@@ -65,7 +65,7 @@ dirname, mainFile = path.split(path.abspath("__file__"))
         tkMessageBox.showinfo("Invalid directory","Please select a valid directory...")
         """
 #### remove in final version
-dataDirname = "C:/Users/chris/Documents/Projects/DrKellyProject/Data/"
+dataDirname = "C:\\Users\\chris\\Documents\\Projects\\DrKellyProject\\Data\\"
 
 # cd to data directory
 chdir(dataDirname)
@@ -123,7 +123,7 @@ please wait..." % (numFiles, calcForThreshold)
         # also save each pigeon data to a dictionary for GUI processing
         allData[pigeonName]=pigeon.dataframe
     #### Uncomment in final version
-    #allWriter.save()
+    allWriter.save()
 
     # also calculate how long formatting takes
     processingTime = time.time() - startTime
@@ -208,10 +208,11 @@ element within the GUI.\n\n"
                 for frameIndex in outputFrames:
                     outputFrames[frameIndex].to_excel(writer,sheet_name = frameIndex)
 
-                print "Saving output of chosen groups and pigeons to ", chosenName
                 writer.save()
+                print "Saving output of chosen groups and pigeons to ", chosenName
             except:
-                tkMessageBox.showinfo("Saving cancelled", "Saving operation was cancelled")
+                tkMessageBox.showinfo("Saving cancelled", "Sorry, there was an \
+error--Saving operation was cancelled")
         elif (trialsForOutput==[] and animalsForOutput==[]):
             tkMessageBox.showinfo("Nothing selected",
                             "Please select something to analyze")
@@ -223,23 +224,24 @@ element within the GUI.\n\n"
                             "Please select at least one bird to analyze")
 
     def checkReformat(self, thresholdBox, reset): # re-run if threshold has been changed
-        if reset==True:
-            thresholdBox.delete(0,END)
-            thresholdBox.insert(0,defaultThreshold)
+        value = float(thresholdBox.get())
 
         try:
-            value = float(thresholdBox.get())
+            if (value==defaultThreshold):
+                print "Threshold has not changed from default"
+                return
+            if (reset==True):
+                thresholdBox.delete(0,END)
+                thresholdBox.insert(0,defaultThreshold)
+                value = defaultThreshold
 
-            if (value,reset)==(defaultThreshold,False):
-                print "Threshold has not changed from default."
-            else:
-                (outputFilename, processingTime) = analyzePigeons(value,path)
-                printInfo(processingTime, outputFilename)
+            (outputFilename, processingTime) = analyzePigeons(value,path)
+            printInfo(processingTime, outputFilename)
         except:
             tkMessageBox.showinfo("Not a number","Please enter a valid number")
             thresholdBox.delete(0,END)
             thresholdBox.insert(0,defaultThreshold)
-            
+
 
     # Create all of the buttons and components of the GUI
     def createComponents(self):
@@ -395,25 +397,10 @@ trial type.")
                 groupsForOutput.append(keys[indexOfButton])
         return groupsForOutput
 
-    # sort by group and store in list of dataframes
-    def sortByTrialType(self, trial, gotrialFrame, AFtrialFrame, trialFrame, outputFrames):
-        if (trial=="GO"):
-            outputFrames["GO-Opp Distance"] = gotrialFrame.sort_values(["Trial Type",
-            "Pigeon Name"])
-        elif (trial=="AF"):
-            outputFrames["AF-Opp Distance"] = gotrialFrame.sort_values(["Trial Type",
-            "Pigeon Name"])
-            outputFrames["AF-AF Distance"] = AFtrialFrame.sort_values(["Trial Type",
-            "Pigeon Name"])
-        outputFrames[trial] = trialFrame.sort_values(["Trial Type","Pigeon Name"])
-
-        return outputFrames
-
-
     # function for parsing dataframe based on groups
     def analyzeGroups(self, trials, animals):
         outputFrames = {}
-        columns = ["Pigeon Name","Trial Type", "Average Dist"]
+        columns = ["Pigeon Name","Trial Type","Removed Pecks", "Average Dist"]
         goColumns = list(columns)
         goColumns[-1] = "Average Opp Dist"
         AFColumns = list(goColumns)
@@ -442,9 +429,15 @@ trial type.")
                 tempFrame = self.getFrame(pigeonFrame, columns, trial)
                 trialFrame = trialFrame.append(tempFrame) # add this pigeon to trial frame
 
-            if (self.sortOutput.get()): # sort if the sort checkbutton is selected
-                outputFrames[trial] = self.sortByTrialType(trial, gotrialFrame,
-                            AFtrialFrame, trialFrame, outputFrames)
+            # sort by group and store in list of dataframes if selected to
+            #if (self.sortOutput==1):
+
+            if (trial=="GO"):
+                outputFrames["GO-Opp Distance"] = gotrialFrame.sort(["Trial Type", "Pigeon Name"])
+            elif (trial=="AF"):
+                outputFrames["AF-Opp Distance"] = gotrialFrame.sort(["Trial Type", "Pigeon Name"])
+                outputFrames["AF-AF Distance"] = AFtrialFrame.sort(["Trial Type", "Pigeon Name"])
+            outputFrames[trial] = trialFrame.sort(["Trial Type","Pigeon Name"])
 
         return outputFrames
 
