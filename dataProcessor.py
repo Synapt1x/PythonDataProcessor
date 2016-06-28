@@ -213,7 +213,6 @@ was selected. Saving operation cancelled.")
             # create the excel writer object
             for frameIndex in outputFrames:
                 outputFrames[frameIndex].to_excel(writer,sheet_name = frameIndex)
-                
             try:
                 writer.save()
                 print "Saving output of chosen groups and pigeons to ", chosenName
