@@ -74,8 +74,12 @@ attempt %0.0f/5" % numErrors,"Please select a valid directory...")
 chdir(dataDirname)
 
 # list all files of type .xls
-allFiles = glob.glob("*Test.xls")
-numFiles = len(allFiles)
+allFiles = glob.glob("*.xls")
+try:
+    numFiles = len(allFiles)
+except:
+    tkMessageBox.showinfo("No excel spreadsheets found. Please restart the program.")
+
 
 # create excelwriter object for outputting all data to excel
 #allWriter = pd.ExcelWriter(outputFilename)
