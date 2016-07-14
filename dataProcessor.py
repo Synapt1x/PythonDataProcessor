@@ -46,6 +46,7 @@ animalButtons = []
 
 # locate the current directory and file location
 dirname, mainFile = path.split(path.abspath("__file__"))
+dirname = dirname.replace('/',sep)
 
 # Ask user to identify the data directory
 numErrors = 0
@@ -212,11 +213,8 @@ element within the GUI.\n\n"
             chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname,
                             initialfile=initialFileName)
             chosenName = chosenName.replace('/',sep);
-            print dirname + sep + initialFileName
-            print chosenName
             if (chosenName != dirname + sep + initialFileName):
                 chosenName = chosenName + '.xls'
-            print chosenName
 
             try:
                 # create excelwriter object for outputting to excel
