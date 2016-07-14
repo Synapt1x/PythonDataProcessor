@@ -130,14 +130,14 @@ class Pigeon:
             if (peckIndex+1 in self.OppsIndices):
                 xOppDists = xPecks.apply(lambda x: x - self.OppsX[peckIndex+1])
                 yOppDists = yPecks.apply(lambda y: y - self.OppsY[peckIndex+1])
-                (finalOppDists,OppnumRemoved,OppavgDist) = self.thresholdCalc(xOppDists,yOppDists, 40)
+                (finalOppDists,OppnumRemoved,OppavgDist) = self.thresholdCalc(xOppDists,yOppDists, threshold)
                 allOppDists = pd.concat([allOppDists,finalOppDists], axis=0)
                 removedPecks[peckIndex+1] = OppnumRemoved
                 oppPeckDist[peckIndex+1] = "No Pecks" if (OppnumRemoved==10) else OppavgDist
             if (peckIndex+2 in self.AFIndices):
                 xAFDists = xPecks.apply(lambda x: x - self.AFsX[peckIndex+2])
                 yAFDists = yPecks.apply(lambda y: y - self.AFsY[peckIndex+2])
-                (finalAFDists,AFnumRemoved,AFavgDist) = self.thresholdCalc(xAFDists,yAFDists, 40)
+                (finalAFDists,AFnumRemoved,AFavgDist) = self.thresholdCalc(xAFDists,yAFDists, threshold)
                 allAFDists = pd.concat([allAFDists,finalAFDists], axis=0)
                 removedPecks[peckIndex+2] = AFnumRemoved
                 AFPeckDist[peckIndex+2] = "No Pecks" if (AFnumRemoved==10) else AFavgDist
