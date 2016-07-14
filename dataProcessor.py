@@ -11,7 +11,7 @@ software.
 """
 from Tkinter import *
 from ttk import Frame, Style
-from os import chdir, path
+from os import chdir, path, sep
 
 import pandas as pd  # import pandas data structures (DataFrame) and read_excel
 
@@ -61,7 +61,7 @@ selected over multipled attempts. Do you want to quit instead?")
             break
     try:
         dataDirname = tkFileDialog.askdirectory(parent=root,
-            initialdir="/",title="Please select the data directory.")
+            initialdir=sep,title="Please select the data directory.")
         if not dataDirname:
             raise ValueError("empty string")
         break
@@ -69,6 +69,8 @@ selected over multipled attempts. Do you want to quit instead?")
         numErrors += 1
         tkMessageBox.showinfo("Invalid directory - Failed \
 attempt %0.0f/5" % numErrors,"Please select a valid directory...")
+
+dataDirname = dataDirname.replace('/',sep)
 
 # cd to data directory
 chdir(dataDirname)
@@ -79,10 +81,6 @@ try:
     numFiles = len(allFiles)
 except:
     tkMessageBox.showinfo("No excel spreadsheets found. Please restart the program.")
-
-
-# create excelwriter object for outputting all data to excel
-#allWriter = pd.ExcelWriter(outputFilename)
 
 # First read-in the data
 for file in allFiles:
@@ -150,7 +148,6 @@ this may not be an issue. Saving the output of initial data processing was \
 cancelled.")
 
 
-
 #=============================================================================#
 #==========main function for handling processing and GUI functions============#
 #=============================================================================#
@@ -214,6 +211,12 @@ element within the GUI.\n\n"
             initialFileName = todaysDate + '-' + '-'.join(trialsForOutput) + ".xls"
             chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname,
                             initialfile=initialFileName)
+            chosenName = chosenName.replace('/',sep);
+            print dirname + sep + initialFileName
+            print chosenName
+            if (chosenName != dirname + sep + initialFileName):
+                chosenName = chosenName + '.xls'
+            print chosenName
 
             try:
                 # create excelwriter object for outputting to excel
