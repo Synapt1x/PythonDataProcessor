@@ -213,19 +213,19 @@ element within the GUI.\n\n"
             chosenName = tkFileDialog.asksaveasfilename(initialdir=dirname,
                             initialfile=initialFileName)
             chosenName = chosenName.replace('/',sep);
-            if (chosenName != dirname + sep + initialFileName):
-                chosenName = chosenName + '.xls'
+            if (chosenName != dirname + sep + initialFileName) and (".xls" not in chosenName):
+                chosenName = chosenName + ".xls"
 
             try:
                 # create excelwriter object for outputting to excel
                 writer = pd.ExcelWriter(chosenName)
+                # create the excel writer object
+                for frameIndex in outputFrames:
+                    outputFrames[frameIndex].to_excel(writer,sheet_name = frameIndex)
             except:
                 tkMessageBox.showinfo("Saving cancelled", "No output file name \
 was selected. Saving operation cancelled.")
 
-            # create the excel writer object
-            for frameIndex in outputFrames:
-                outputFrames[frameIndex].to_excel(writer,sheet_name = frameIndex)
             try:
                 writer.save()
                 print "Saving output of chosen groups and pigeons to ", chosenName
