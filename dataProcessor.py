@@ -333,6 +333,10 @@ long wall."]
         #======================================================================
         animalsFrame = Frame(self)
         animalsFrame.pack(expand=True, anchor=CENTER, side=RIGHT)
+
+
+        
+
         self.animals = list(allData.keys())
 
         self.animalVals = []
