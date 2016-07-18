@@ -333,16 +333,16 @@ long wall."]
 
         # Create a frame for handling all of the birds
         #======================================================================
-        animalsFrame = Frame(self, width = 100, height = 440)
+        animalsFrame = Frame(self, width = 100, height=360)
         animalsFrame.pack(expand=True, anchor=CENTER, side=RIGHT)
 
-        self.animalCanvas = Canvas(animalsFrame, width = 100, height = 440, scrollregion = (0,0,500,1000))
-        self.newFrame = Frame(self.animalCanvas)
+        self.animalCanvas = Canvas(animalsFrame, width=100, height=360, scrollregion = (0,0,500,1000))
+        self.newFrame = Frame(self.animalCanvas, width=100, height=360)
         self.animalScrollbar = Scrollbar(animalsFrame,orient="vertical",command=self.animalCanvas.yview)
         self.animalCanvas.configure(yscrollcommand=self.animalScrollbar.set)
 
         self.animalScrollbar.pack(side="right",fill="y")
-        self.animalCanvas.pack(side="left")
+        self.animalCanvas.pack(side="top")
         self.animalCanvas.create_window((0,0),window=self.newFrame,anchor='nw')
         self.newFrame.bind("<Configure>",self.scrollFunc)
 
