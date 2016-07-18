@@ -13,7 +13,7 @@ build_exe_options = {
 
 setup(
     name = "Pigeon Data Processor",
-    version = "1.0",
+    version = "1.3",
     description = "Program used to process experimental data from studies run on pigeons involving a comparison on peck location with relation to a goal target in geometry and feature driven learning environments.",
     author = "Chris Cadonic",
     options = {"build_exe": build_exe_options},
