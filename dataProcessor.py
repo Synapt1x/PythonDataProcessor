@@ -261,7 +261,7 @@ currently in use. Saving operation cancelled.")
             thresholdBox.delete(0,END)
             thresholdBox.insert(0,defaultThreshold)
 
-    def scrollFunc(event):
+    def scrollFunc():
         self.animalCanvas.configure(scrollregion=self.animalCanvas.bbox("all"))
 
     # Create all of the buttons and components of the GUI
@@ -333,10 +333,10 @@ long wall."]
 
         # Create a frame for handling all of the birds
         #======================================================================
-        animalsFrame = Frame(self)
+        animalsFrame = Frame(self, width = 100, height = 440)
         animalsFrame.pack(expand=True, anchor=CENTER, side=RIGHT)
 
-        self.animalCanvas = Canvas(animalsFrame)
+        self.animalCanvas = Canvas(animalsFrame, width = 100, height = 440, scrollregion = (0,0,500,1000))
         self.newFrame = Frame(self.animalCanvas)
         self.animalScrollbar = Scrollbar(animalsFrame,orient="vertical",command=self.animalCanvas.yview)
         self.animalCanvas.configure(yscrollcommand=self.animalScrollbar.set)
@@ -357,9 +357,10 @@ long wall."]
                                    variable=self.animalVals[bird],
                                    font=self.componentFont))
             self.animalVals[-1].set(1)
-            animalButtons[-1].pack(pady=8)
+            animalButtons[-1].pack(pady=6)
         # create select/deselect all buttons
         self.createButtons(animalsFrame,self.animalVals, "animals")
+
 
         # Create a frame for handling all of the additional buttons
         #======================================================================
