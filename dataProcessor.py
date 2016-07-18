@@ -261,7 +261,7 @@ currently in use. Saving operation cancelled.")
             thresholdBox.delete(0,END)
             thresholdBox.insert(0,defaultThreshold)
 
-    def scrollFunc():
+    def scrollFunc(self, event):
         self.animalCanvas.configure(scrollregion=self.animalCanvas.bbox("all"))
 
     # Create all of the buttons and components of the GUI
@@ -353,7 +353,7 @@ long wall."]
         # Create a button for each bird in the data directory
         for bird in range(len(self.animals)):
             self.animalVals.append(IntVar())
-            animalButtons.append(Checkbutton(animalsFrame, text=self.animals[bird],
+            animalButtons.append(Checkbutton(self.newFrame, text=self.animals[bird],
                                    variable=self.animalVals[bird],
                                    font=self.componentFont))
             self.animalVals[-1].set(1)
