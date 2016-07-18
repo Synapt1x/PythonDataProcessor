@@ -262,7 +262,7 @@ currently in use. Saving operation cancelled.")
             thresholdBox.insert(0,defaultThreshold)
 
     def scrollFunc(event):
-        animalCanvas.configure(scrollregion=animalCanvas.bbox("all"),width=200,height=200)
+        self.animalCanvas.configure(scrollregion=self.animalCanvas.bbox("all"))
 
     # Create all of the buttons and components of the GUI
     def createComponents(self):
@@ -336,15 +336,15 @@ long wall."]
         animalsFrame = Frame(self)
         animalsFrame.pack(expand=True, anchor=CENTER, side=RIGHT)
 
-        animalCanvas = Canvas(animalsFrame)
-        newFrame = Frame(animalCanvas)
-        animalScrollbar = Scrollbar(animalsFrame,orient="vertical",command=animalCanvas.yview)
-        animalCanvas.configure(yscrollcommand=animalScrollbar.set)
+        self.animalCanvas = Canvas(animalsFrame)
+        self.newFrame = Frame(self.animalCanvas)
+        self.animalScrollbar = Scrollbar(animalsFrame,orient="vertical",command=self.animalCanvas.yview)
+        self.animalCanvas.configure(yscrollcommand=self.animalScrollbar.set)
 
-        animalScrollbar.pack(side="right",fill="y")
-        animalCanvas.pack(side="left")
-        animalCanvas.create_window((0,0),window=newFrame,anchor='nw')
-        newFrame.bind("<Configure>",self.scrollFunc)
+        self.animalScrollbar.pack(side="right",fill="y")
+        self.animalCanvas.pack(side="left")
+        self.animalCanvas.create_window((0,0),window=self.newFrame,anchor='nw')
+        self.newFrame.bind("<Configure>",self.scrollFunc)
 
         self.animals = list(allData.keys())
 
