@@ -410,9 +410,9 @@ trial type.")
 
     def create_window(self):
         self.counter += 1
-        t = tk.Toplevel(self)
+        t = Toplevel(self)
         t.wm_title("Window #%s" % self.counter)
-        l = tk.Label(t, text="This is window #%s" % self.counter)
+        l = Label(t, text="This is window #%s" % self.counter)
         l.pack(side="top", fill="both", expand=True, padx=100, pady=100)
 
     # function for determining which groups/animals will be analyzed
