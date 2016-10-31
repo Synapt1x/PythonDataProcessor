@@ -7,12 +7,12 @@ ____
 ### Pre-requisites
 In order to build this program, the build system must have *Python 2.7* installed. With Python installed, you will also need the following packages:
 
-*numpy
-*pandas
-*Tkinter
-*glob
-*xlsWriter
-*cx-Freeze
++*numpy*
++*pandas*
++*Tkinter*
++*glob*
++*xlsWriter*
++*cx-Freeze*
 
 If you need any of these packages installed, or aren't sure if they are updated/installed, you can simply run
 
