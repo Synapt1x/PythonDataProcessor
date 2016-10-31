@@ -6,6 +6,7 @@ ____
 ## Building
 ### Pre-requisites
 In order to build this program, the build system must have *Python 2.7* installed. With Python installed, you will also need the following packages:
+
 *numpy
 *pandas
 *Tkinter
