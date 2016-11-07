@@ -5,3 +5,4 @@ build/
 Meetings/
 build/
 PyInstaller-3.2/
+data/
