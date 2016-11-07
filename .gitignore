@@ -4,3 +4,4 @@ output-threshold-*
 build/
 Meetings/
 build/
+PyInstaller-3.2/
